@@ -4,9 +4,15 @@ import { Space, Badge } from 'antd';
 import { Link } from 'react-router-dom';
 import styles from './Header.module.css';
 import { ShoppingCart } from 'lucide-react';
+import { useState } from 'react';
+import { LoginModal } from '../../auth/login/LoginModal';
+import { RegisterModal } from '../../auth/register/RegisterModal';
+
 const { Header } = Layout;
 
 const AppHeader = () => {
+    const [loginVisible, setLoginVisible] = useState(false);
+    const [registerVisible, setRegisterVisible] = useState(false);
     const categoriesMenu = {
         items: [
             {
@@ -52,13 +58,27 @@ const AppHeader = () => {
               <div className={styles.iconGroup}>
                 <Space size="large">
                     <SearchOutlined style={{ color: '#fff', fontSize: 18 }} />
-                    <UserOutlined style={{ color: '#fff', fontSize: 18 }} />
+                      <UserOutlined
+                          onClick={() => setLoginVisible(true)}                     
+                          style={{ color: '#fff', fontSize: 18 }}
+                      />
                     <Badge count={0} size="small" offset={[0, 5]}>
-                        <ShoppingCartOutlined style={{ color: '#fff', fontSize: 18 }} />
+                      <ShoppingCartOutlined style={{ color: '#fff', fontSize: 18 }} />
                     </Badge>
                 </Space>
               </div>
           </Header>
+
+          <LoginModal
+              visible={loginVisible}
+              onClose={() => setLoginVisible(false)}
+              onSwitchToRegister={() => { setRegisterVisible(true); setLoginVisible(false); }}
+          />
+          <RegisterModal
+              visible={registerVisible}
+              onClose={() => setRegisterVisible(false)}
+              onSwitchToLogin={() => { setLoginVisible(true); setRegisterVisible(false); }}
+          />
     </div>
   )
 }

@@ -1,0 +1,35 @@
+.registerModal {
+    text-align: center;
+}
+
+.registerTitle {
+    font-size: 25px;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.registerForm {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.inputField {
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.registerButton {
+    width: 100%;
+}
+
+.loginText {
+    font-size: 14px;
+    margin-top: 10px;
+}
+
+.loginLink {
+    color: #1890ff;
+    cursor: pointer;
+    margin-left: 5px;
+}

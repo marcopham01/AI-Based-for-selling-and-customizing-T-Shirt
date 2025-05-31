@@ -6,6 +6,7 @@ import './App.css';
 import AppLayout from './components/layouts/Layout';
 import { HomePage } from './pages/HomePage';
 
+
 const router = createBrowserRouter([
   {
     path: '/',
