@@ -2,7 +2,7 @@
 import AppHeader from './header/Header';
 import AppFooter from './footer/Footer';
 import { Outlet } from 'react-router-dom';
-import styles from './Layout.module.css'; // Assuming you have a CSS module for styles
+import styles from './Layout.module.css';
 
 const MainLayout = () => {
   return (

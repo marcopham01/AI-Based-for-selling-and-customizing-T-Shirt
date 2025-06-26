@@ -1,7 +1,7 @@
 import { Dropdown, Layout, Menu } from 'antd'
 import { ShoppingCartOutlined, UserOutlined, SearchOutlined, ReadOutlined } from '@ant-design/icons';
 import { Space, Badge } from 'antd';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import styles from './Header.module.css';
 import { ShoppingCart } from 'lucide-react';
 import { useState } from 'react';
@@ -13,16 +13,21 @@ const { Header } = Layout;
 const AppHeader = () => {
     const [loginVisible, setLoginVisible] = useState(false);
     const [registerVisible, setRegisterVisible] = useState(false);
+    const navigate = useNavigate();
     const categoriesMenu = {
         items: [
             {
                 key: '1',
-                label: <Link to="/categories/male">Male</Link>,
+                label: <Link to="/categories/tshirt">T-Shirt</Link>,
             },
             {
                 key: '2',
-                label: <Link to="/categories/female">Female</Link>,
+                label: <Link to="/categories/hoodie">Hoodie</Link>,
             },
+            {
+                key: '3',
+                label: <Link to="/categories/sweater">Sweater</Link>,
+            }
         ],
     };
     
@@ -47,7 +52,7 @@ const AppHeader = () => {
                     </Link>
               </div>
               <div className={styles.menu}>
-                  <a href="">Product</a>
+                  <a href="" onClick={() => navigate('/products')}>Product</a>
                 <Dropdown menu={categoriesMenu}>
                     <a href="">Categories</a>
                 </Dropdown>

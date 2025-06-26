@@ -1,8 +1,32 @@
 import { Button, Input, Modal } from 'antd'
 import React from 'react'
 import styles from './LoginModal.module.css'
+import { loginUser } from '../../../api/authApi';
+import { toast } from 'react-toastify';
+import { jwtDecode } from 'jwt-decode';
 
 export const LoginModal = ({ visible, onClose, onSwitchToRegister }) => {
+
+  const [username, setUsername] = React.useState('');
+  const [password, setPassword] = React.useState('');
+
+
+  const handleLogin = async () => {
+
+    try {
+      const response = await loginUser({ username, password });
+      const token = response.data.accessToken;
+      const decoded = jwtDecode(token);
+      const usernameFromToken = decoded.userName;
+      localStorage.setItem('token', token);
+      console.log('Login successful for:', usernameFromToken);
+      toast.success(`Welcome back, ${usernameFromToken}!`);
+      onClose();
+    } catch (error) {
+      console.error('Login failed:', error.message);
+      toast.error('Login failed. Please try again.');
+    }
+  }
 
   return (
       <div>
@@ -15,9 +39,20 @@ export const LoginModal = ({ visible, onClose, onSwitchToRegister }) => {
           >
               <h2 className={styles.loginTitle}>Login</h2>
               <div className={styles.loginForm}>
-                  <Input type='text' placeholder='Username' className={styles.inputField} />
-                  <Input.Password placeholder='Password' className={styles.inputField} />  
-                  <Button type='primary' className={styles.loginButton} onClick={onClose}>
+            <Input
+              type='text'
+              placeholder='Username'
+              className={styles.inputField}
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+            />
+            <Input.Password
+              placeholder='Password'
+            className={styles.inputField}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            />  
+                  <Button type='primary' className={styles.loginButton} onClick={handleLogin}>
                     Login
                   </Button>
                   <p className={styles.registerText}>Don't have an account?
