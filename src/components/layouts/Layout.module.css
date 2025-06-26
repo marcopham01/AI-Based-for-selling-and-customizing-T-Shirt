@@ -13,6 +13,5 @@ body {
 
 .mainContent {
     flex: 1;
-    background-color: #f4f4f4;
-    padding: 20px;
+    background: linear-gradient(to bottom, white, #8ed2ff);
 }

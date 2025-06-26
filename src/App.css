@@ -1,0 +1,17 @@
+@import url('https://fonts.googleapis.com/css2?family=Rosarivo:ital@0;1&family=Varela&family=Varela+Round&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+    font-family: 'Rosarivo', serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+    overflow-x: hidden;
+}
