@@ -9,13 +9,11 @@ const MainLayout = () => {
   return (
     <div className={styles.layoutContainer}>
       <AppHeader />
-      <div className='relative'>
-        <SlidingText />
-        <main className={styles.mainContent}>
-          <Outlet /> {/* chỗ render page */}
-        </main>
-        <AppFooter />
-      </div>
+      <SlidingText />
+      <main className={styles.mainContent}>
+        <Outlet /> {/* chỗ render page */}
+      </main>
+      <AppFooter />
     </div>
   );
 };

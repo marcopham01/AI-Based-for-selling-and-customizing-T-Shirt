@@ -25,7 +25,7 @@ const AppHeader = () => {
             },
         ],
     };
-    
+
     const infoMenu = {
         items: [
             {
@@ -37,49 +37,53 @@ const AppHeader = () => {
                 label: <Link to="/info/faq">FAQ</Link>,
             },
         ],
-    };    
-  return (
-      <div>
-          <Header className={styles.header} >
-              <div className={styles.logo}>
+    };
+    return (
+        <div>
+            <Header className={styles.header} >
+                <div className={styles.logo}>
                     <Link to="/">
                         <img src="/meomeo.jpg" alt="AI T-Shirt Shop Logo" className={styles.logoImage} />
                     </Link>
-              </div>
-              <div className={styles.menu}>
-                  <a href="">Product</a>
-                <Dropdown menu={categoriesMenu}>
-                    <a href="">Categories</a>
-                </Dropdown>
-                <Dropdown menu={infoMenu}>
-                    <a href="">Info</a>
-                </Dropdown>
-              </div>
-              <div className={styles.iconGroup}>
-                <Space size="large">
-                    <SearchOutlined style={{ color: '#fff', fontSize: 18 }} />
-                      <UserOutlined
-                          onClick={() => setLoginVisible(true)}                     
-                          style={{ color: '#fff', fontSize: 18 }}
-                      />
-                    <Badge count={0} size="small" offset={[0, 5]}>
-                      <ShoppingCartOutlined style={{ color: '#fff', fontSize: 18 }} />
-                    </Badge>
-                </Space>
-              </div>
-          </Header>
+                </div>
+                <div className={styles.menu}>
+                    <a href="">Product</a>
+                    <Dropdown
+                        menu={categoriesMenu}
+                        overlayClassName={styles.fullWidthDropdown}
+                        getPopupContainer={() => document.querySelector('.' + styles.header)}
+                    >
+                        <a href="">Categories</a>
+                    </Dropdown>
+                    <Dropdown menu={infoMenu}>
+                        <a href="">Info</a>
+                    </Dropdown>
+                </div>
+                <div className={styles.iconGroup}>
+                    <Space size="large">
+                        <SearchOutlined style={{ color: '#fff', fontSize: 18 }} />
+                        <UserOutlined
+                            onClick={() => setLoginVisible(true)}
+                            style={{ color: '#fff', fontSize: 18 }}
+                        />
+                        <Badge count={0} size="small" offset={[0, 5]}>
+                            <ShoppingCartOutlined style={{ color: '#fff', fontSize: 18 }} />
+                        </Badge>
+                    </Space>
+                </div>
+            </Header>
 
-          <LoginModal
-              visible={loginVisible}
-              onClose={() => setLoginVisible(false)}
-              onSwitchToRegister={() => { setRegisterVisible(true); setLoginVisible(false); }}
-          />
-          <RegisterModal
-              visible={registerVisible}
-              onClose={() => setRegisterVisible(false)}
-              onSwitchToLogin={() => { setLoginVisible(true); setRegisterVisible(false); }}
-          />
-    </div>
-  )
+            <LoginModal
+                visible={loginVisible}
+                onClose={() => setLoginVisible(false)}
+                onSwitchToRegister={() => { setRegisterVisible(true); setLoginVisible(false); }}
+            />
+            <RegisterModal
+                visible={registerVisible}
+                onClose={() => setRegisterVisible(false)}
+                onSwitchToLogin={() => { setLoginVisible(true); setRegisterVisible(false); }}
+            />
+        </div>
+    )
 }
 export default AppHeader;

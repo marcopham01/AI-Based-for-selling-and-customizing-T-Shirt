@@ -1,10 +1,30 @@
-import React from 'react'
+import React, { useState } from 'react'
 import Carousel from '../components/Carousel'
-import Card from '../components/Card'
 import { useNavigate } from 'react-router-dom'
+import ButtonFilter, { filters } from '../components/ButtonFilter'
+
+// Component hiển thị từng category như hình mẫu
+const CategoryCard = ({ image, title, onClick }) => (
+  <div
+    onClick={onClick}
+    className="flex flex-col items-center cursor-pointer transition-transform duration-200 hover:-translate-y-2"
+    style={{ width: 220 }}
+  >
+    <div
+      className="rounded-2xl shadow-lg overflow-hidden border border-gray-200 bg-white"
+      style={{ width: 220, height: 300, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+    >
+      <img src={image} alt={title} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'cover' }} />
+    </div>
+    <div className="mt-4 text-lg font-bold text-black text-center uppercase tracking-wide">
+      {title}
+    </div>
+  </div>
+);
 
 export const HomePage = () => {
   const navigate = useNavigate();
+  const [selectedFilter, setSelectedFilter] = useState(filters[0].value);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-blue-100">
@@ -12,18 +32,10 @@ export const HomePage = () => {
       <div className="container mx-auto text-center pt-20 px-4">
         <h1 className="text-3xl font-bold text-blue-600">EXPLORE NEW TRENDING PRODUCTS</h1>
       </div>
-      <div className="flex flex-col md:flex-row justify-center items-center gap-4 w-full pb-12 px-4">
-        <Card
-          image="https://assets.hermes.com/is/image/hermesproduct/h-puzzle-t-shirt-with-leather-detail--557930HA90-worn-1-0-0-800-800_g.jpg"
-          title="MEN"
-          description="Áo thun nam chất lượng cao"
-          onClick={() => window.location.href = '#'}
-        />
-        <Card
-          image="https://assets.hermes.com/is/image/hermesproduct/les-clefs-cropped-t-shirt--5E4624DA02-worn-1-0-0-800-800_g.jpg"
-          title="WOMEN "
-          description="Áo thun nữ chất lượng cao"
-          onClick={() => window.location.href = '#'}
+      <div className="flex justify-center mt-8 mb-4">
+        <ButtonFilter
+          selected={selectedFilter}
+          onChange={setSelectedFilter}
         />
       </div>
       {/* Section About Us với nền ảnh */}
