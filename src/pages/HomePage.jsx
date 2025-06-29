@@ -1,6 +1,6 @@
 import React from 'react'
 import Carousel from '../components/Carousel'
-import Card from '../pages/products/Products'
+import Card from '../components/Card'
 import { useNavigate } from 'react-router-dom'
 
 export const HomePage = () => {

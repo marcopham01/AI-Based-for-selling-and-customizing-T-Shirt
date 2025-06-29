@@ -1,16 +1,30 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useCart } from '../../contexts/CartContext';
+import { useAuth } from '../../contexts/AuthContext';
 import styles from './Cart.module.css';
 import { ShoppingCartOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 
 const Cart = () => {
   const { items, removeFromCart, updateQuantity, getCartTotal, clearCart } = useCart();
+  const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
+
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate('/');
+    }
+  }, [isAuthenticated, navigate]);
 
   const formatPrice = (price) => {
     return new Intl.NumberFormat('vi-VN').format(price);
   };
+
+  // Show loading or redirect if not authenticated
+  if (!isAuthenticated) {
+    return null;
+  }
 
   if (items.length === 0) {
     return (

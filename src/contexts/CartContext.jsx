@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
+import { useAuth } from './AuthContext';
 
 const CartContext = createContext();
 
@@ -59,24 +60,54 @@ export const CartProvider = ({ children }) => {
   const [state, dispatch] = useReducer(cartReducer, {
     items: []
   });
+  const { user, isAuthenticated } = useAuth();
 
-  // Load cart from localStorage on mount
+  // Get cart key for current user
+  const getCartKey = (userId) => {
+    return userId ? `cart_${userId}` : 'cart_guest';
+  };
+
+  // Load cart from localStorage on mount and when user changes
   useEffect(() => {
-    const savedCart = localStorage.getItem('cart');
-    if (savedCart) {
-      try {
-        const cartData = JSON.parse(savedCart);
-        dispatch({ type: 'LOAD_CART', payload: cartData });
-      } catch (error) {
-        console.error('Error loading cart from localStorage:', error);
+    if (isAuthenticated && user) {
+      // Load user's cart
+      const cartKey = getCartKey(user.id || user._id);
+      const savedCart = localStorage.getItem(cartKey);
+      if (savedCart) {
+        try {
+          const cartData = JSON.parse(savedCart);
+          dispatch({ type: 'LOAD_CART', payload: cartData });
+        } catch (error) {
+          console.error('Error loading user cart from localStorage:', error);
+        }
+      } else {
+        dispatch({ type: 'CLEAR_CART' });
+      }
+    } else {
+      // Load guest cart
+      const savedCart = localStorage.getItem('cart_guest');
+      if (savedCart) {
+        try {
+          const cartData = JSON.parse(savedCart);
+          dispatch({ type: 'LOAD_CART', payload: cartData });
+        } catch (error) {
+          console.error('Error loading guest cart from localStorage:', error);
+        }
       }
     }
-  }, []);
+  }, [isAuthenticated, user]);
 
   // Save cart to localStorage whenever it changes
   useEffect(() => {
-    localStorage.setItem('cart', JSON.stringify(state.items));
-  }, [state.items]);
+    if (isAuthenticated && user) {
+      // Save to user's cart
+      const cartKey = getCartKey(user.id || user._id);
+      localStorage.setItem(cartKey, JSON.stringify(state.items));
+    } else {
+      // Save to guest cart
+      localStorage.setItem('cart_guest', JSON.stringify(state.items));
+    }
+  }, [state.items, isAuthenticated, user]);
 
   const addToCart = (product) => {
     dispatch({ type: 'ADD_TO_CART', payload: product });

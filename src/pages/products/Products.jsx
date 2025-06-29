@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import styles from "./Products.module.css"
 import { getProducts } from "../../api/productApi"
 import { useCart } from "../../contexts/CartContext"
+import { useAuth } from "../../contexts/AuthContext"
 import { ShoppingCartOutlined } from '@ant-design/icons';
 import { notification, message } from 'antd';
 
@@ -23,6 +24,7 @@ const Products = () => {
   const genders = ["Male", "Female", "Unisex"]
 
   const { addToCart } = useCart()
+  const { isAuthenticated } = useAuth()
 
   useEffect(() => {
     getProducts()
@@ -66,6 +68,11 @@ const Products = () => {
 
   // Hàm thêm sản phẩm và hiện thông báo
   const handleAddToCart = (product, idx) => {
+    if (!isAuthenticated) {
+      message.warning('Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng!');
+      return;
+    }
+    
     const id = product.id || product._id || idx;
     addToCart({ ...product, id });
     message.success(`${product.name} đã được thêm vào giỏ hàng!`);
@@ -171,7 +178,7 @@ const Products = () => {
                   {/* Cart Icon Button */}
                   <button
                     className={styles.cartIconBtn}
-                    title="Thêm vào giỏ hàng"
+                    title={isAuthenticated ? "Thêm vào giỏ hàng" : "Đăng nhập để thêm vào giỏ hàng"}
                     onClick={() => handleAddToCart(product, idx)}
                   >
                     <ShoppingCartOutlined style={{ fontSize: 24 }} />

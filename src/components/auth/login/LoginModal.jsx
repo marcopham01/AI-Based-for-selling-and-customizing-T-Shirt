@@ -4,12 +4,13 @@ import styles from './LoginModal.module.css'
 import { loginUser } from '../../../api/authApi';
 import { toast } from 'react-toastify';
 import { jwtDecode } from 'jwt-decode';
+import { useAuth } from '../../../contexts/AuthContext';
 
 export const LoginModal = ({ visible, onClose, onSwitchToRegister }) => {
 
   const [username, setUsername] = React.useState('');
   const [password, setPassword] = React.useState('');
-
+  const { login } = useAuth();
 
   const handleLogin = async () => {
 
@@ -18,7 +19,20 @@ export const LoginModal = ({ visible, onClose, onSwitchToRegister }) => {
       const token = response.data.accessToken;
       const decoded = jwtDecode(token);
       const usernameFromToken = decoded.userName;
+      
+      // Save token to localStorage
       localStorage.setItem('token', token);
+      
+      // Create user object and save to AuthContext
+      const userData = {
+        username: usernameFromToken,
+        email: decoded.email || '',
+        name: decoded.name || usernameFromToken,
+        token: token
+      };
+      
+      login(userData);
+      
       console.log('Login successful for:', usernameFromToken);
       toast.success(`Welcome back, ${usernameFromToken}!`);
       onClose();

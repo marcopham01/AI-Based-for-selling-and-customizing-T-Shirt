@@ -8,6 +8,7 @@ import { useState } from 'react';
 import { LoginModal } from '../../auth/login/LoginModal';
 import { RegisterModal } from '../../auth/register/RegisterModal';
 import { useCart } from '../../../contexts/CartContext';
+import { useAuth } from '../../../contexts/AuthContext';
 
 const { Header } = Layout;
 
@@ -15,7 +16,9 @@ const AppHeader = () => {
     const [loginVisible, setLoginVisible] = useState(false);
     const [registerVisible, setRegisterVisible] = useState(false);
     const navigate = useNavigate();
-    const { items } = useCart();
+    const { items, getCartCount } = useCart();
+    const { isAuthenticated } = useAuth();
+    
     const categoriesMenu = {
         items: [
             {
@@ -44,7 +47,24 @@ const AppHeader = () => {
                 label: <Link to="/info/faq">FAQ</Link>,
             },
         ],
-    };    
+    };
+
+    const handleUserIconClick = () => {
+        if (isAuthenticated) {
+            navigate('/profile');
+        } else {
+            setLoginVisible(true);
+        }
+    };
+
+    const handleCartClick = () => {
+        if (isAuthenticated) {
+            navigate('/cart');
+        } else {
+            setLoginVisible(true);
+        }
+    };
+    
   return (
       <div>
           <Header className={styles.header} >
@@ -66,14 +86,16 @@ const AppHeader = () => {
                 <Space size="large">
                     <SearchOutlined style={{ color: '#fff', fontSize: 18 }} />
                       <UserOutlined
-                          onClick={() => setLoginVisible(true)}                     
-                          style={{ color: '#fff', fontSize: 18 }}
+                          onClick={handleUserIconClick}                     
+                          style={{ color: '#fff', fontSize: 18, cursor: 'pointer' }}
                       />
-                    <Badge count={items.length} size="small" offset={[0, 5]}>
-                      <ShoppingCartOutlined 
-                      onClick={() => navigate('/cart')} 
-                      style={{ color: '#fff', fontSize: 18 }} />
-                    </Badge>
+                    {isAuthenticated && (
+                      <Badge count={getCartCount()} size="small" offset={[0, 5]}>
+                        <ShoppingCartOutlined 
+                        onClick={handleCartClick} 
+                        style={{ color: '#fff', fontSize: 18, cursor: 'pointer' }} />
+                      </Badge>
+                    )}
                 </Space>
               </div>
           </Header>

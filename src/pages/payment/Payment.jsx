@@ -1,15 +1,38 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styles from './Payment.module.css';
 import { useCart } from '../../contexts/CartContext';
+import { useAuth } from '../../contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 const Payment = () => {
   const { items, getCartTotal } = useCart();
+  const { user, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
   const [form, setForm] = useState({
     name: '',
     phone: '',
     address: '',
     note: ''
   });
+
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate('/');
+    }
+  }, [isAuthenticated, navigate]);
+
+  // Auto-fill user information when component mounts or user changes
+  useEffect(() => {
+    if (user) {
+      setForm({
+        name: user.name || '',
+        phone: user.phone || '',
+        address: user.address || '',
+        note: ''
+      });
+    }
+  }, [user]);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -19,6 +42,11 @@ const Payment = () => {
     e.preventDefault();
     alert('Thanh toán thành công!');
   };
+
+  // Show loading or redirect if not authenticated
+  if (!isAuthenticated) {
+    return null;
+  }
 
   return (
     <div className={styles.container}>
@@ -49,19 +77,45 @@ const Payment = () => {
           <h2 className={styles.sectionTitle}>Thông tin nhận hàng</h2>
           <label>
             Họ tên
-            <input name="name" value={form.name} onChange={handleChange} required />
+            <input 
+              name="name" 
+              value={form.name} 
+              onChange={handleChange} 
+              required 
+              disabled
+              style={{ backgroundColor: '#f5f5f5', cursor: 'not-allowed' }}
+            />
           </label>
           <label>
             Số điện thoại
-            <input name="phone" value={form.phone} onChange={handleChange} required pattern="[0-9]{10,11}" />
+            <input 
+              name="phone" 
+              value={form.phone} 
+              onChange={handleChange} 
+              required 
+              pattern="[0-9]{10,11}" 
+              disabled
+              style={{ backgroundColor: '#f5f5f5', cursor: 'not-allowed' }}
+            />
           </label>
           <label>
             Địa chỉ nhận hàng
-            <input name="address" value={form.address} onChange={handleChange} required />
+            <input 
+              name="address" 
+              value={form.address} 
+              onChange={handleChange} 
+              required 
+              placeholder="Nhập địa chỉ giao hàng"
+            />
           </label>
           <label>
             Ghi chú (tuỳ chọn)
-            <textarea name="note" value={form.note} onChange={handleChange} />
+            <textarea 
+              name="note" 
+              value={form.note} 
+              onChange={handleChange} 
+              placeholder="Ghi chú về đơn hàng (nếu có)"
+            />
           </label>
           <button type="submit" className={styles.payBtn}>Xác nhận thanh toán</button>
         </form>

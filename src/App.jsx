@@ -8,7 +8,9 @@ import { HomePage } from './pages/HomePage';
 import Products from './pages/products/Products';
 import Cart from './pages/cart/Cart';
 import { CartProvider } from './contexts/CartContext';
+import { AuthProvider } from './contexts/AuthContext';
 import Payment from './pages/payment/Payment';
+import Profile from './pages/user/Profile';
 
 const router = createBrowserRouter([
   {
@@ -30,15 +32,21 @@ const router = createBrowserRouter([
       {
         path: '/payment',
         element: <Payment />,
+      },
+      {
+        path: '/profile',
+        element: <Profile />,
       }
     ],
   }
 ]);
 const App = () => {
   return (
-    <CartProvider>
-      <RouterProvider router={router} />
-    </CartProvider>
+    <AuthProvider>
+      <CartProvider>
+        <RouterProvider router={router} />
+      </CartProvider>
+    </AuthProvider>
   );
 };
 

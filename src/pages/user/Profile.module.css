@@ -1,0 +1,429 @@
+.profileBg {
+  min-height: 100vh;
+  background: #f9fafb;
+  padding: 32px 0 0 0;
+}
+
+.profileHeader {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.profileHeader h1 {
+  color: #374151;
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.profileFlexContent {
+  max-width: 900px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 4px 24px rgba(59,130,246,0.08), 0 1.5px 6px rgba(0,0,0,0.04);
+  padding: 40px 32px 60px 32px;
+  position: relative;
+  min-height: 420px;
+}
+
+.avatarCol {
+  flex: 0 0 180px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 12px;
+  padding-top: 12px;
+}
+
+.infoCol {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  margin-left: 48px;
+}
+
+.infoFields {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.editButtonOutline {
+  border: 2px solid #3b82f6;
+  background: transparent;
+  color: #3b82f6;
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 0.2s;
+  box-shadow: none;
+}
+.editButtonOutline:hover {
+  background: #f0f7ff;
+  color: #1d4ed8;
+  border-color: #1d4ed8;
+}
+
+.editActionsVertical {
+  display: flex;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.saveButton {
+  background: #3b82f6;
+  border: 2px solid #3b82f6;
+  color: #fff;
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+.saveButton:hover {
+  background: #2563eb;
+  border-color: #2563eb;
+}
+
+.cancelButton {
+  border: 2px solid #d1d5db;
+  background: transparent;
+  color: #374151;
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+.cancelButton:hover {
+  background: #f3f4f6;
+  color: #1d4ed8;
+  border-color: #1d4ed8;
+}
+
+.logoutButtonOutline {
+  position: absolute;
+  right: 32px;
+  bottom: 24px;
+  border: 2px solid #ef4444;
+  background: transparent;
+  color: #ef4444;
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 0.2s;
+  box-shadow: none;
+}
+.logoutButtonOutline:hover {
+  background: #fff1f2;
+  color: #b91c1c;
+  border-color: #b91c1c;
+}
+
+@media (max-width: 900px) {
+  .profileFlexContent {
+    flex-direction: column;
+    align-items: center;
+    padding: 24px 8px 60px 8px;
+  }
+  .infoCol {
+    margin-left: 0;
+    margin-top: 24px;
+    width: 100%;
+  }
+  .logoutButtonOutline {
+    right: 16px;
+    bottom: 16px;
+  }
+}
+
+@media (max-width: 600px) {
+  .profileHeader h1 {
+    font-size: 1.5rem;
+  }
+  .profileFlexContent {
+    padding: 8px 2px 60px 2px;
+    min-height: 0;
+  }
+  .avatarCol {
+    flex: 0 0 120px;
+  }
+  .infoCol {
+    margin-top: 16px;
+  }
+  .logoutButtonOutline {
+    right: 8px;
+    bottom: 8px;
+    font-size: 0.95rem;
+    padding: 6px 12px;
+  }
+}
+
+.profileCard {
+  border-radius: 20px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  border: none;
+  overflow: hidden;
+}
+
+.avatar {
+  border: 4px solid white;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+}
+
+.avatarSection h2 {
+  color: #333;
+  font-size: 1.8rem;
+  font-weight: 600;
+  margin: 10px 0 5px 0;
+}
+
+.userEmail {
+  color: #666;
+  font-size: 1rem;
+  margin: 0;
+}
+
+.formSection {
+  padding: 30px;
+}
+
+.formSection h3 {
+  color: #333;
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin-bottom: 25px;
+  border-bottom: 2px solid #f0f0f0;
+  padding-bottom: 10px;
+}
+
+.actionButtons {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 30px;
+  background: #f8f9fa;
+  border-top: 1px solid #e9ecef;
+}
+
+.editActions {
+  display: flex;
+  gap: 10px;
+}
+
+.editButton {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  border-radius: 8px;
+  padding: 8px 20px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.editButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(102, 126, 234, 0.3);
+}
+
+.logoutButton {
+  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+  border: none;
+  border-radius: 8px;
+  padding: 8px 20px;
+  font-weight: 500;
+  color: white;
+  transition: all 0.3s ease;
+}
+
+.logoutButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(255, 107, 107, 0.3);
+  color: white;
+}
+
+/* Form styling */
+.formSection :global(.ant-form-item-label > label) {
+  font-weight: 600;
+  color: #333;
+}
+
+.formSection :global(.ant-input) {
+  border-radius: 8px;
+  border: 2px solid #e9ecef;
+  padding: 12px 16px;
+  transition: all 0.3s ease;
+}
+
+.formSection :global(.ant-input:focus),
+.formSection :global(.ant-input-focused) {
+  border-color: #667eea;
+  box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+}
+
+.formSection :global(.ant-input-textarea) {
+  border-radius: 8px;
+  border: 2px solid #e9ecef;
+}
+
+.formSection :global(.ant-input-textarea:focus),
+.formSection :global(.ant-input-textarea-focused) {
+  border-color: #667eea;
+  box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .profileContainer {
+    padding: 10px;
+  }
+
+  .profileHeader h1 {
+    font-size: 2rem;
+  }
+
+  .profileCard {
+    border-radius: 15px;
+  }
+
+  .avatarSection {
+    padding: 20px 0;
+  }
+
+  .avatar {
+    width: 80px !important;
+    height: 80px !important;
+  }
+
+  .avatarSection h2 {
+    font-size: 1.5rem;
+  }
+
+  .formSection {
+    padding: 20px;
+  }
+
+  .actionButtons {
+    flex-direction: column;
+    gap: 15px;
+    padding: 20px;
+  }
+
+  .editActions {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .logoutButton {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .profileHeader h1 {
+    font-size: 1.8rem;
+  }
+
+  .formSection {
+    padding: 15px;
+  }
+
+  .actionButtons {
+    padding: 15px;
+  }
+}
+
+.cardBodyRow {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 32px;
+  padding: 32px 24px;
+}
+
+.avatarSectionCard {
+  flex: 0 0 140px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding-top: 12px;
+}
+
+.infoSectionCard {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.infoMain {
+  margin-bottom: 8px;
+}
+
+.infoName {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 4px;
+}
+
+.userEmail {
+  color: #666;
+  font-size: 1.1rem;
+  margin-bottom: 0;
+}
+
+.formSectionCard {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px 32px;
+}
+
+.formSectionCard .ant-form-item {
+  margin-bottom: 12px;
+}
+
+.actionButtonsCard {
+  display: flex;
+  gap: 16px;
+  margin-top: 18px;
+  align-items: center;
+}
+
+@media (max-width: 900px) {
+  .cardBodyRow {
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    padding: 24px 8px;
+  }
+  .formSectionCard {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .avatarSectionCard {
+    padding-top: 0;
+  }
+}
+
+@media (max-width: 600px) {
+  .profileCard {
+    padding: 0 !important;
+  }
+  .cardBodyRow {
+    padding: 12px 2px;
+  }
+  .infoName {
+    font-size: 1.3rem;
+  }
+  .formSectionCard {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  .actionButtonsCard {
+    justify-content: space-around;
+    gap: 10px;
+    margin-top: 10px;
+  }
+} 
