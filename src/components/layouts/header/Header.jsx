@@ -7,6 +7,7 @@ import { ShoppingCart } from 'lucide-react';
 import { useState } from 'react';
 import { LoginModal } from '../../auth/login/LoginModal';
 import { RegisterModal } from '../../auth/register/RegisterModal';
+import { useCart } from '../../../contexts/CartContext';
 
 const { Header } = Layout;
 
@@ -14,6 +15,7 @@ const AppHeader = () => {
     const [loginVisible, setLoginVisible] = useState(false);
     const [registerVisible, setRegisterVisible] = useState(false);
     const navigate = useNavigate();
+    const { items } = useCart();
     const categoriesMenu = {
         items: [
             {
@@ -67,8 +69,10 @@ const AppHeader = () => {
                           onClick={() => setLoginVisible(true)}                     
                           style={{ color: '#fff', fontSize: 18 }}
                       />
-                    <Badge count={0} size="small" offset={[0, 5]}>
-                      <ShoppingCartOutlined style={{ color: '#fff', fontSize: 18 }} />
+                    <Badge count={items.length} size="small" offset={[0, 5]}>
+                      <ShoppingCartOutlined 
+                      onClick={() => navigate('/cart')} 
+                      style={{ color: '#fff', fontSize: 18 }} />
                     </Badge>
                 </Space>
               </div>

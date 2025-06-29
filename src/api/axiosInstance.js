@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const axiousInstance = axios.create({
+const axiosInstance = axios.create({
     baseURL: 'http://localhost:5000',
     headers: {
         'Content-Type': 'application/json',
@@ -8,4 +8,16 @@ const axiousInstance = axios.create({
     },
 });
 
-export default axiousInstance;
+// Thêm interceptor để tự động gắn token vào header Authorization
+axiosInstance.interceptors.request.use(
+    (config) => {
+        const token = localStorage.getItem('token');
+        if (token) {
+            config.headers['Authorization'] = `Bearer ${token}`;
+        }
+        return config;
+    },
+    (error) => Promise.reject(error)
+);
+
+export default axiosInstance;

@@ -6,7 +6,9 @@ import './App.css';
 import AppLayout from './components/layouts/Layout';
 import { HomePage } from './pages/HomePage';
 import Products from './pages/products/Products';
-
+import Cart from './pages/cart/Cart';
+import { CartProvider } from './contexts/CartContext';
+import Payment from './pages/payment/Payment';
 
 const router = createBrowserRouter([
   {
@@ -20,13 +22,23 @@ const router = createBrowserRouter([
       {
         path: '/products',
         element: <Products />,
+      },
+      {
+        path: '/cart',
+        element: <Cart />,
+      },
+      {
+        path: '/payment',
+        element: <Payment />,
       }
     ],
   }
 ]);
 const App = () => {
   return (
-    <RouterProvider router={router} />
+    <CartProvider>
+      <RouterProvider router={router} />
+    </CartProvider>
   );
 };
 
