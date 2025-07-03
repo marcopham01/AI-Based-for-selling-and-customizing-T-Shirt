@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { getProfile, updateProfile as updateProfileApi } from '../api/authApi';
 
 const AuthContext = createContext();
 
@@ -7,36 +8,77 @@ export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Load user from localStorage on mount
+  // Load user from API khi app mount nếu có token
   useEffect(() => {
-    const savedUser = localStorage.getItem('user');
-    if (savedUser) {
-      try {
-        const userData = JSON.parse(savedUser);
-        setUser(userData);
-        setIsAuthenticated(true);
-      } catch (error) {
-        console.error('Error loading user from localStorage:', error);
-      }
+    const token = localStorage.getItem('token');
+    if (token) {
+      getProfile()
+        .then(res => {
+          const apiUser = res.data.data;
+          setUser({
+            ...apiUser,
+            name: apiUser.username,
+            phone: apiUser.phonenumber,
+          });
+          setIsAuthenticated(true);
+        })
+        .catch(() => {
+          setUser(null);
+          setIsAuthenticated(false);
+        })
+        .finally(() => setIsLoading(false));
+    } else {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   }, []);
 
   const login = (userData) => {
-    setUser(userData);
     setIsAuthenticated(true);
-    localStorage.setItem('user', JSON.stringify(userData));
+    // Sau khi login thành công, gọi API lấy profile
+    getProfile()
+      .then(res => {
+        const apiUser = res.data.data;
+        setUser({
+          ...apiUser,
+          name: apiUser.username,
+          phone: apiUser.phonenumber,
+        });
+      })
+      .catch(() => {
+        setUser(null);
+        setIsAuthenticated(false);
+      });
   };
 
   const logout = () => {
     setUser(null);
     setIsAuthenticated(false);
     localStorage.removeItem('user');
+    localStorage.removeItem('token');
   };
 
-  const updateUser = (newUserData) => {
-    setUser(newUserData);
-    localStorage.setItem('user', JSON.stringify(newUserData));
+  const updateUser = async (newUserData) => {
+    try {
+      // Map lại key cho đúng backend
+      const payload = {
+        ...newUserData,
+        username: newUserData.name,
+        phonenumber: newUserData.phone,
+      };
+      await updateProfileApi(payload);
+      // Sau khi update thành công, lấy lại profile mới nhất
+      const res = await getProfile();
+      const apiUser = res.data.data;
+      setUser({
+        ...apiUser,
+        name: apiUser.username,
+        phone: apiUser.phonenumber,
+      });
+      setIsAuthenticated(true);
+    } catch (error) {
+      setUser(null);
+      setIsAuthenticated(false);
+    }
   };
 
   const value = {

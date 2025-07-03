@@ -10,6 +10,7 @@ const Profile = () => {
   const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
   const [form] = Form.useForm();
+  const [loading, setLoading] = useState(false);
 
   // Redirect if not authenticated, only after loading
   useEffect(() => {
@@ -26,12 +27,17 @@ const Profile = () => {
     navigate('/');
   };
 
-  const handleSave = (values) => {
-    // Cập nhật user trong context và localStorage
-    const updatedUser = { ...user, ...values };
-    updateUser(updatedUser);
-    message.success('Cập nhật thông tin thành công!');
-    setIsEditing(false);
+  const handleSave = async (values) => {
+    setLoading(true);
+    try {
+      await updateUser(values);
+      message.success('Cập nhật thông tin thành công!');
+      setIsEditing(false);
+    } catch (error) {
+      message.error('Cập nhật thất bại!');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleCancel = () => {
@@ -111,6 +117,7 @@ const Profile = () => {
                   icon={<SaveOutlined />}
                   htmlType="submit"
                   className={styles.saveButton}
+                  loading={loading}
                 >
                   Lưu
                 </Button>

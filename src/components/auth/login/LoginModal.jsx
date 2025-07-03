@@ -13,28 +13,14 @@ export const LoginModal = ({ visible, onClose, onSwitchToRegister }) => {
   const { login } = useAuth();
 
   const handleLogin = async () => {
-
     try {
       const response = await loginUser({ username, password });
       const token = response.data.accessToken;
-      const decoded = jwtDecode(token);
-      const usernameFromToken = decoded.userName;
-      
       // Save token to localStorage
       localStorage.setItem('token', token);
-      
-      // Create user object and save to AuthContext
-      const userData = {
-        username: usernameFromToken,
-        email: decoded.email || '',
-        name: decoded.name || usernameFromToken,
-        token: token
-      };
-      
-      login(userData);
-      
-      console.log('Login successful for:', usernameFromToken);
-      toast.success(`Welcome back, ${usernameFromToken}!`);
+      // Gọi login để context tự lấy profile
+      login({ token });
+      toast.success(`Welcome back, ${username}!`);
       onClose();
     } catch (error) {
       console.error('Login failed:', error.message);
