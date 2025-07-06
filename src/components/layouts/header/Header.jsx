@@ -16,7 +16,7 @@ const AppHeader = () => {
     const [loginVisible, setLoginVisible] = useState(false);
     const [registerVisible, setRegisterVisible] = useState(false);
     const navigate = useNavigate();
-    const { items, getCartCount } = useCart();
+    const { items } = useCart();
     const { isAuthenticated } = useAuth();
     
     const categoriesMenu = {
@@ -90,7 +90,7 @@ const AppHeader = () => {
                           style={{ color: '#fff', fontSize: 18, cursor: 'pointer' }}
                       />
                     {isAuthenticated && (
-                      <Badge count={getCartCount()} size="small" offset={[0, 5]}>
+                      <Badge count={items.length} size="small" offset={[0, 5]}>
                         <ShoppingCartOutlined 
                         onClick={handleCartClick} 
                         style={{ color: '#fff', fontSize: 18, cursor: 'pointer' }} />

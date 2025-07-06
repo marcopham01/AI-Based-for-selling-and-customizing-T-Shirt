@@ -1,14 +1,18 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useCart } from '../../contexts/CartContext';
 import { useAuth } from '../../contexts/AuthContext';
 import styles from './Cart.module.css';
 import { ShoppingCartOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
+import { Spin } from 'antd';
 
 const Cart = () => {
-  const { items, removeFromCart, updateQuantity, getCartTotal, clearCart } = useCart();
+  const { items, removeFromCart, updateQuantity, getCartTotal, clearCart, loading } = useCart();
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
+
+  // State lưu các sản phẩm được chọn (dạng: [{id, size}])
+  const [selectedItems, setSelectedItems] = useState([]);
 
   // Redirect to login if not authenticated
   useEffect(() => {
@@ -26,6 +30,17 @@ const Cart = () => {
     return null;
   }
 
+  // Show loading spinner while fetching cart data
+  if (loading) {
+    return (
+      <div className={styles.container}>
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '400px' }}>
+          <Spin size="large" />
+        </div>
+      </div>
+    );
+  }
+
   if (items.length === 0) {
     return (
       <div className={styles.emptyCart}>
@@ -41,19 +56,67 @@ const Cart = () => {
     );
   }
 
+  // Hàm kiểm tra sản phẩm đã được chọn chưa
+  const isSelected = (item) => {
+    return selectedItems.some(
+      (selected) => selected.id === item.id && selected.size === item.size
+    );
+  };
+
+  // Hàm xử lý chọn/bỏ chọn sản phẩm
+  const handleSelectItem = (item) => {
+    const key = { id: item.id, size: item.size };
+    if (isSelected(item)) {
+      setSelectedItems(selectedItems.filter(
+        (selected) => !(selected.id === item.id && selected.size === item.size)
+      ));
+    } else {
+      setSelectedItems([...selectedItems, key]);
+    }
+  };
+
+  const handleRemoveSelected = async () => {
+    for (const selected of selectedItems) {
+      await removeFromCart(selected.id, selected.size);
+    }
+    setSelectedItems([]);
+  };
+
+  const handleCheckout = () => {
+    if (selectedItems.length === 0) return;
+    // Lấy danh sách sản phẩm đã chọn
+    const selectedProducts = items.filter(item => isSelected(item));
+    navigate('/payment', { state: { selectedProducts } });
+  };
+
+  // Hàm tính tổng số lượng và tổng tiền các sản phẩm đã chọn
+  const selectedProducts = items.filter(item => isSelected(item));
+  const selectedTotalQuantity = selectedProducts.reduce((sum, item) => sum + item.quantity, 0);
+  const selectedTotalPrice = selectedProducts.reduce((sum, item) => sum + item.price * item.quantity, 0);
+
   return (
     <div className={styles.container}>
       <div className={styles.header}>
         <h1>Giỏ hàng</h1>
       </div>
-      <button onClick={clearCart} className={styles.clearCart}>
-        Xóa tất cả
+      <button
+        onClick={selectedItems.length > 0 ? handleRemoveSelected : clearCart}
+        className={styles.clearCart}
+        disabled={selectedItems.length === 0 && items.length === 0}
+      >
+        {selectedItems.length > 0 ? 'Xóa sản phẩm đã chọn' : 'Xóa tất cả'}
       </button>
 
-      <div className={styles.content}>
+      <div className={`${styles.content} ${selectedItems.length === 0 ? styles.fullWidth : ''}`}>
         <div className={styles.cartItems}>
           {items.map((item, idx) => (
             <div key={item.id || item._id || idx} className={styles.cartItem}>
+              <input
+                type="checkbox"
+                checked={isSelected(item)}
+                onChange={() => handleSelectItem(item)}
+                className={styles.selectCheckbox}
+              />
               <div className={styles.itemImage}>
                 <img src={item.image || "/placeholder.svg"} alt={item.name} />
               </div>
@@ -61,10 +124,13 @@ const Cart = () => {
               <div className={styles.itemDetails}>
                 <h3 className={styles.itemName}>{item.name}</h3>
                 <p className={styles.itemPrice}>{formatPrice(item.price)}đ</p>
+                {item.size && (
+                  <p className={styles.itemSize}>Size: {item.size}</p>
+                )}
                 
                 <div className={styles.quantityControl}>
                   <button
-                    onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                    onClick={() => updateQuantity(item.id, item.quantity - 1, item.size)}
                     className={styles.quantityBtn}
                     disabled={item.quantity <= 1}
                   >
@@ -72,7 +138,7 @@ const Cart = () => {
                   </button>
                   <span className={styles.quantity}>{item.quantity}</span>
                   <button
-                    onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                    onClick={() => updateQuantity(item.id, item.quantity + 1, item.size)}
                     className={styles.quantityBtn}
                   >
                     +
@@ -83,7 +149,7 @@ const Cart = () => {
               <div className={styles.itemTotal}>
                 <p className={styles.totalPrice}>{formatPrice(item.price * item.quantity)}đ</p>
                 <button
-                  onClick={() => removeFromCart(item.id)}
+                  onClick={() => removeFromCart(item.id, item.size)}
                   className={styles.removeBtn}
                 >
                   <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -95,34 +161,35 @@ const Cart = () => {
           ))}
         </div>
 
-        <div className={styles.cartSummary}>
-          <h2>Tổng đơn hàng</h2>
-          
-          <div className={styles.summaryRow}>
-            <span>Tạm tính:</span>
-            <span>{formatPrice(getCartTotal())}đ</span>
+        {/* Chỉ hiện card tổng đơn hàng khi có sản phẩm được chọn */}
+        {selectedItems.length > 0 && (
+          <div className={styles.cartSummary}>
+            <h2>Tổng đơn hàng</h2>
+            <div className={styles.summaryRow}>
+              <span>Tổng sản phẩm:</span>
+              <span>{selectedTotalQuantity}</span>
+            </div>
+            <div className={styles.summaryRow}>
+              <span>Tạm tính:</span>
+              <span>{formatPrice(selectedTotalPrice)}đ</span>
+            </div>
+            <div className={styles.summaryDivider}></div>
+            <div className={styles.summaryRow}>
+              <span className={styles.totalLabel}>Tổng cộng:</span>
+              <span className={styles.totalAmount}>{formatPrice(selectedTotalPrice)}đ</span>
+            </div>
+            <button
+              className={styles.checkoutBtn}
+              onClick={handleCheckout}
+              disabled={selectedItems.length === 0}
+            >
+              Tiến hành thanh toán
+            </button>
+            <a href="/products" className={styles.continueShopping}>
+              Tiếp tục mua sắm
+            </a>
           </div>
-          
-          <div className={styles.summaryRow}>
-            <span>Phí vận chuyển:</span>
-            <span>Miễn phí</span>
-          </div>
-          
-          <div className={styles.summaryDivider}></div>
-          
-          <div className={styles.summaryRow}>
-            <span className={styles.totalLabel}>Tổng cộng:</span>
-            <span className={styles.totalAmount}>{formatPrice(getCartTotal())}đ</span>
-          </div>
-
-          <button className={styles.checkoutBtn} onClick={() => navigate('/payment')}>
-            Tiến hành thanh toán
-          </button>
-          
-          <a href="/products" className={styles.continueShopping}>
-            Tiếp tục mua sắm
-          </a>
-        </div>
+        )}
       </div>
     </div>
   );

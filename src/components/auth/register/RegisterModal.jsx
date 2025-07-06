@@ -4,24 +4,37 @@ import styles from './RegisterModal.module.css';
 import { registerUser } from '../../../api/authApi';
 
 export const RegisterModal = ({ visible, onClose, onSwitchToLogin }) => {
+  const [form, setForm] = useState({
+    username: '',
+    password: '',
+    confirmPassword: '',
+    phonenumber: '',
+    email: '',
+    fullname: '',
+  });
+  const [error, setError] = useState('');
 
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
 
   const handleRegister = async () => {
-    if (password !== confirmPassword) {
-      alert('Passwords do not match');
+    setError('');
+    if (form.password !== form.confirmPassword) {
+      setError('Passwords do not match');
       return;
     }
     try {
-      const response = await registerUser({ username, password });
+      // Gửi đúng các trường cho BE
+      const { username, password, phonenumber, email, fullname } = form;
+      const response = await registerUser({ username, password, phonenumber, email, fullname });
       console.log('Registration successful:', response.data);
       onClose();
     } catch (error) {
-      console.log({ error: error.message });
+      setError(error.response?.data?.message || 'Registration failed');
     }
-  }
+  };
+
   return (
     <div>
       <Modal
@@ -33,12 +46,59 @@ export const RegisterModal = ({ visible, onClose, onSwitchToLogin }) => {
       >
         <h2 className={styles.registerTitle}>Register</h2>
         <div className={styles.registerForm}>
-          <Input type='text' placeholder='Username' className={styles.inputField} />
-          <Input.Password placeholder='Password' className={styles.inputField} />
-          <Input.Password placeholder='Confirm Password' className={styles.inputField} />
+          <Input
+            name="username"
+            placeholder="Username"
+            className={styles.inputField}
+            value={form.username}
+            onChange={handleChange}
+            required
+          />
+          <Input.Password
+            name="password"
+            placeholder="Password"
+            className={styles.inputField}
+            value={form.password}
+            onChange={handleChange}
+            required
+          />
+          <Input.Password
+            name="confirmPassword"
+            placeholder="Confirm Password"
+            className={styles.inputField}
+            value={form.confirmPassword}
+            onChange={handleChange}
+            required
+          />
+          <Input
+            name="phonenumber"
+            placeholder="Phone Number"
+            className={styles.inputField}
+            value={form.phonenumber}
+            onChange={handleChange}
+            required
+          />
+          <Input
+            name="email"
+            type="email"
+            placeholder="Email"
+            className={styles.inputField}
+            value={form.email}
+            onChange={handleChange}
+            required
+          />
+          <Input
+            name="fullname"
+            placeholder="Full Name"
+            className={styles.inputField}
+            value={form.fullname}
+            onChange={handleChange}
+            required
+          />
           <Button type='primary' className={styles.registerButton} onClick={handleRegister}>
             Register
           </Button>
+          {error && <div style={{ color: 'red', marginTop: 8 }}>{error}</div>}
           <p className={styles.loginText}>
             Already have an account?
             <span className={styles.loginLink} onClick={onSwitchToLogin}>

@@ -6,13 +6,16 @@ import { getProducts } from "../../api/productApi"
 import { useCart } from "../../contexts/CartContext"
 import { useAuth } from "../../contexts/AuthContext"
 import { ShoppingCartOutlined } from '@ant-design/icons';
-import { notification, message } from 'antd';
+import { notification, message, Modal, Select } from 'antd';
 
 const Products = () => {
   const [products, setProducts] = useState([])
   const [sortBy, setSortBy] = useState("latest")
   const [selectedSize, setSelectedSize] = useState("")
   const [selectedGender, setSelectedGender] = useState("")
+  const [sizeModalVisible, setSizeModalVisible] = useState(false)
+  const [selectedProduct, setSelectedProduct] = useState(null)
+  const [selectedProductSize, setSelectedProductSize] = useState("M")
 
   // Expandable sections state
   const [expandedSections, setExpandedSections] = useState({
@@ -73,9 +76,34 @@ const Products = () => {
       return;
     }
     
-    const id = product.id || product._id || idx;
-    addToCart({ ...product, id });
-    message.success(`${product.name} đã được thêm vào giỏ hàng!`);
+    // Check if product has specific sizes available
+    const availableSizes = product.sizes || sizes;
+    
+    if (availableSizes.length === 1) {
+      // If only one size, add directly
+      const id = product.id || product._id || idx;
+      addToCart({ ...product, id, size: availableSizes[0] });
+      message.success(`${product.name} đã được thêm vào giỏ hàng!`);
+    } else {
+      // If multiple sizes, show size selection modal
+      setSelectedProduct({ ...product, id: product.id || product._id || idx });
+      setSelectedProductSize("M"); // Default size
+      setSizeModalVisible(true);
+    }
+  };
+
+  const handleSizeConfirm = () => {
+    if (selectedProduct) {
+      addToCart({ ...selectedProduct, size: selectedProductSize });
+      message.success(`${selectedProduct.name} (Size ${selectedProductSize}) đã được thêm vào giỏ hàng!`);
+      setSizeModalVisible(false);
+      setSelectedProduct(null);
+    }
+  };
+
+  const handleSizeCancel = () => {
+    setSizeModalVisible(false);
+    setSelectedProduct(null);
   };
 
   return (
@@ -206,6 +234,39 @@ const Products = () => {
           </div>
         </div>
       </div>
+
+      {/* Size Selection Modal */}
+      <Modal
+        title="Chọn kích thước"
+        open={sizeModalVisible}
+        onOk={handleSizeConfirm}
+        onCancel={handleSizeCancel}
+        okText="Thêm vào giỏ hàng"
+        cancelText="Hủy"
+      >
+        {selectedProduct && (
+          <div style={{ textAlign: 'center' }}>
+            <img 
+              src={selectedProduct.image || "/placeholder.svg"} 
+              alt={selectedProduct.name} 
+              style={{ width: '100px', height: '100px', objectFit: 'cover', marginBottom: '16px' }}
+            />
+            <h3>{selectedProduct.name}</h3>
+            <p style={{ marginBottom: '16px' }}>Chọn kích thước:</p>
+            <Select
+              value={selectedProductSize}
+              onChange={setSelectedProductSize}
+              style={{ width: '100%' }}
+            >
+              {sizes.map(size => (
+                <Select.Option key={size} value={size}>
+                  {size}
+                </Select.Option>
+              ))}
+            </Select>
+          </div>
+        )}
+      </Modal>
     </div>
   )
 }

@@ -1,56 +1,15 @@
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
-import { useAuth } from './AuthContext';
+import { getCart, addToCart as addToCartAPI, updateCartItem as updateCartItemAPI, removeFromCart as removeFromCartAPI } from '../api/cartApi';
+import { message } from 'antd';
 
 const CartContext = createContext();
 
 const cartReducer = (state, action) => {
   switch (action.type) {
-    case 'ADD_TO_CART':
-      const existingItem = state.items.find(item => item.id === action.payload.id);
-      if (existingItem) {
-        return {
-          ...state,
-          items: state.items.map(item =>
-            item.id === action.payload.id
-              ? { ...item, quantity: item.quantity + 1 }
-              : item
-          )
-        };
-      } else {
-        return {
-          ...state,
-          items: [...state.items, { ...action.payload, quantity: 1 }]
-        };
-      }
-
-    case 'REMOVE_FROM_CART':
-      return {
-        ...state,
-        items: state.items.filter(item => item.id !== action.payload)
-      };
-
-    case 'UPDATE_QUANTITY':
-      return {
-        ...state,
-        items: state.items.map(item =>
-          item.id === action.payload.id
-            ? { ...item, quantity: action.payload.quantity }
-            : item
-        )
-      };
-
-    case 'CLEAR_CART':
-      return {
-        ...state,
-        items: []
-      };
-
     case 'LOAD_CART':
-      return {
-        ...state,
-        items: action.payload
-      };
-
+      return { ...state, items: action.payload };
+    case 'SET_LOADING':
+      return { ...state, loading: action.payload };
     default:
       return state;
   }
@@ -58,106 +17,114 @@ const cartReducer = (state, action) => {
 
 export const CartProvider = ({ children }) => {
   const [state, dispatch] = useReducer(cartReducer, {
-    items: []
+    items: [],
+    loading: false
   });
-  const { user, isAuthenticated } = useAuth();
 
-  // Get cart key for current user
-  const getCartKey = (userId) => {
-    return userId ? `cart_${userId}` : 'cart_guest';
-  };
-
-  // Load cart from localStorage on mount and when user changes
-  useEffect(() => {
-    if (isAuthenticated && user) {
-      // Load user's cart
-      const cartKey = getCartKey(user.id || user._id);
-      const savedCart = localStorage.getItem(cartKey);
-      if (savedCart) {
-        try {
-          const cartData = JSON.parse(savedCart);
-          dispatch({ type: 'LOAD_CART', payload: cartData });
-        } catch (error) {
-          console.error('Error loading user cart from localStorage:', error);
+  // Fetch cart from BE if token exists
+  const fetchCart = async () => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      dispatch({ type: 'SET_LOADING', payload: true });
+      try {
+        const res = await getCart();
+        if (res.data && res.data.cart && Array.isArray(res.data.cart.items)) {
+          // Map BE cart to FE format
+          const items = res.data.cart.items.map(item => ({
+            id: item.product_id._id || item.product_id,
+            name: item.product_id.name,
+            price: item.product_id.price,
+            image: item.product_id.image,
+            quantity: item.quantity,
+            size: item.size
+          }));
+          dispatch({ type: 'LOAD_CART', payload: items });
+        } else {
+          dispatch({ type: 'LOAD_CART', payload: [] });
         }
-      } else {
-        dispatch({ type: 'CLEAR_CART' });
+      } catch (err) {
+        dispatch({ type: 'LOAD_CART', payload: [] });
+      } finally {
+        dispatch({ type: 'SET_LOADING', payload: false });
       }
     } else {
-      // Load guest cart
-      const savedCart = localStorage.getItem('cart_guest');
-      if (savedCart) {
-        try {
-          const cartData = JSON.parse(savedCart);
-          dispatch({ type: 'LOAD_CART', payload: cartData });
-        } catch (error) {
-          console.error('Error loading guest cart from localStorage:', error);
-        }
-      }
+      dispatch({ type: 'LOAD_CART', payload: [] });
     }
-  }, [isAuthenticated, user]);
+  };
 
-  // Save cart to localStorage whenever it changes
   useEffect(() => {
-    if (isAuthenticated && user) {
-      // Save to user's cart
-      const cartKey = getCartKey(user.id || user._id);
-      localStorage.setItem(cartKey, JSON.stringify(state.items));
-    } else {
-      // Save to guest cart
-      localStorage.setItem('cart_guest', JSON.stringify(state.items));
+    fetchCart();
+  }, []);
+
+  // Add to cart
+  const addToCart = async (product) => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      message.error('Bạn cần đăng nhập để thêm vào giỏ hàng!');
+      return;
     }
-  }, [state.items, isAuthenticated, user]);
-
-  const addToCart = (product) => {
-    dispatch({ type: 'ADD_TO_CART', payload: product });
+    try {
+      await addToCartAPI({ product_id: product.id || product._id, quantity: 1, size: product.size || 'M' });
+      await fetchCart();
+      message.success(`${product.name} đã được thêm vào giỏ hàng!`);
+    } catch (err) {
+      message.error('Không thể thêm sản phẩm vào giỏ hàng');
+    }
   };
 
-  const removeFromCart = (productId) => {
-    dispatch({ type: 'REMOVE_FROM_CART', payload: productId });
+  // Remove from cart
+  const removeFromCart = async (productId, size = 'M') => {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+    try {
+      await removeFromCartAPI({ product_id: productId, size });
+      await fetchCart();
+      message.success('Đã xóa sản phẩm khỏi giỏ hàng');
+    } catch (err) {
+      message.error('Không thể xóa sản phẩm khỏi giỏ hàng');
+    }
   };
 
-  const updateQuantity = (productId, quantity) => {
+  // Update quantity
+  const updateQuantity = async (productId, quantity, size = 'M') => {
+    const token = localStorage.getItem('token');
+    if (!token) return;
     if (quantity <= 0) {
-      removeFromCart(productId);
-    } else {
-      dispatch({ type: 'UPDATE_QUANTITY', payload: { id: productId, quantity } });
+      await removeFromCart(productId, size);
+      return;
+    }
+    try {
+      await updateCartItemAPI({ product_id: productId, quantity, size });
+      await fetchCart();
+    } catch (err) {
+      message.error('Không thể cập nhật số lượng');
     }
   };
 
-  const clearCart = () => {
-    dispatch({ type: 'CLEAR_CART' });
+  // Clear cart
+  const clearCart = async () => {
+    // Xóa từng item (nếu BE không có API clear all)
+    for (const item of state.items) {
+      await removeFromCart(item.id, item.size);
+    }
+    await fetchCart();
   };
 
-  const getCartTotal = () => {
-    return state.items.reduce((total, item) => total + (item.price * item.quantity), 0);
-  };
-
-  const getCartCount = () => {
-    return state.items.reduce((count, item) => count + item.quantity, 0);
-  };
-
-  const value = {
-    items: state.items,
-    addToCart,
-    removeFromCart,
-    updateQuantity,
-    clearCart,
-    getCartTotal,
-    getCartCount
-  };
+  const getCartTotal = () => state.items.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
   return (
-    <CartContext.Provider value={value}>
+    <CartContext.Provider value={{
+      items: state.items,
+      loading: state.loading,
+      addToCart,
+      removeFromCart,
+      updateQuantity,
+      clearCart,
+      getCartTotal
+    }}>
       {children}
     </CartContext.Provider>
   );
 };
 
-export const useCart = () => {
-  const context = useContext(CartContext);
-  if (!context) {
-    throw new Error('useCart must be used within a CartProvider');
-  }
-  return context;
-};
+export const useCart = () => useContext(CartContext);

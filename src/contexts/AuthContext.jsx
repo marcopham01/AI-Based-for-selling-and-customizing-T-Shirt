@@ -17,7 +17,7 @@ export const AuthProvider = ({ children }) => {
           const apiUser = res.data.data;
           setUser({
             ...apiUser,
-            name: apiUser.username,
+            name: apiUser.fullname,
             phone: apiUser.phonenumber,
           });
           setIsAuthenticated(true);
@@ -40,7 +40,7 @@ export const AuthProvider = ({ children }) => {
         const apiUser = res.data.data;
         setUser({
           ...apiUser,
-          name: apiUser.username,
+          name: apiUser.fullname,
           phone: apiUser.phonenumber,
         });
       })
@@ -62,7 +62,7 @@ export const AuthProvider = ({ children }) => {
       // Map lại key cho đúng backend
       const payload = {
         ...newUserData,
-        username: newUserData.name,
+        fullname: newUserData.name,
         phonenumber: newUserData.phone,
       };
       await updateProfileApi(payload);
@@ -71,7 +71,7 @@ export const AuthProvider = ({ children }) => {
       const apiUser = res.data.data;
       setUser({
         ...apiUser,
-        name: apiUser.username,
+        name: apiUser.fullname,
         phone: apiUser.phonenumber,
       });
       setIsAuthenticated(true);

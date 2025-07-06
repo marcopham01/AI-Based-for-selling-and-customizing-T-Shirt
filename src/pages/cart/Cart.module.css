@@ -46,6 +46,10 @@
   gap: 2rem;
 }
 
+.content.fullWidth {
+  grid-template-columns: 1fr;
+}
+
 .cartItems {
   display: flex;
   flex-direction: column;
@@ -54,13 +58,14 @@
 
 .cartItem {
   display: grid;
-  grid-template-columns: 120px 1fr auto;
+  grid-template-columns: 40px 120px 1fr auto;
   gap: 1rem;
   padding: 1.5rem;
   background: white;
   border-radius: 0.75rem;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   border: 1px solid #e5e7eb;
+  position: relative;
 }
 
 .itemImage img {
@@ -86,7 +91,14 @@
 .itemPrice {
   font-size: 1rem;
   color: #6b7280;
+  margin: 0 0 0.5rem 0;
+}
+
+.itemSize {
+  font-size: 0.875rem;
+  color: #9ca3af;
   margin: 0 0 1rem 0;
+  font-weight: 500;
 }
 
 .quantityControl {
@@ -131,6 +143,7 @@
   flex-direction: column;
   align-items: flex-end;
   justify-content: space-between;
+  padding: 10px;
 }
 
 .totalPrice {
@@ -343,4 +356,14 @@
     flex-direction: column;
     gap: 0.5rem;
   }
+}
+
+.selectCheckbox {
+  position: static;
+  align-self: center;
+  justify-self: center;
+  width: 16px;
+  height: 16px;
+  z-index: 2;
+  margin-right: 0;
 }

@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import styles from './Payment.module.css';
 import { useCart } from '../../contexts/CartContext';
 import { useAuth } from '../../contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const Payment = () => {
   const { items, getCartTotal } = useCart();
   const { user, isAuthenticated } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const selectedProducts = location.state?.selectedProducts || items;
   const [form, setForm] = useState({
     name: '',
     phone: '',
@@ -50,13 +52,13 @@ const Payment = () => {
 
   return (
     <div className={styles.container}>
-      <h1 className={styles.title}>Thanh toán đơn hàng</h1>
+      <h1 className={styles.title}>Xác nhận đơn hàng</h1>
       <div className={styles.content}>
         {/* Cột trái: Thông tin đơn hàng */}
         <div className={styles.orderInfo}>
           <h2 className={styles.sectionTitle}>Sản phẩm đã đặt</h2>
           <div className={styles.productList}>
-            {items.map((item, idx) => (
+            {selectedProducts.map((item, idx) => (
               <div className={styles.productItem} key={item.id || item._id || idx}>
                 <img src={item.image || '/placeholder.svg'} alt={item.name} className={styles.productImage} />
                 <div className={styles.productDetails}>
@@ -69,7 +71,7 @@ const Payment = () => {
           </div>
           <div className={styles.totalRow}>
             <span>Tổng tiền:</span>
-            <span className={styles.total}>{getCartTotal().toLocaleString('vi-VN')}đ</span>
+            <span className={styles.total}>{selectedProducts.reduce((sum, item) => sum + item.price * item.quantity, 0).toLocaleString('vi-VN')}đ</span>
           </div>
         </div>
         {/* Cột phải: Form thanh toán */}
