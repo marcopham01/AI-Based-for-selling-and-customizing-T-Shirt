@@ -4,26 +4,27 @@ body {
     margin: 0;
     padding: 0;
     background: linear-gradient(to bottom, white, #8ed2ff);
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+    background-size: cover;
 }
 
 .layoutContainer {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-    position: relative;
 }
 
 .mainContent {
     flex: 1 0 auto;
-    background: linear-gradient(to bottom, white, #8ed2ff);
-    padding-top: 100px; /* header 60px + sliding text 40px */
 }
 
 footer, .ant-layout-footer {
-    margin-top: auto !important;
     width: 100%;
     padding: 20px 0 !important;
     background: #2f343a !important;
     color: #fff !important;
     text-align: center !important;
+    flex-shrink: 0;
+    margin-top: auto;
 }

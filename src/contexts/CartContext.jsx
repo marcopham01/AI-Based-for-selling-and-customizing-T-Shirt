@@ -110,6 +110,14 @@ export const CartProvider = ({ children }) => {
     await fetchCart();
   };
 
+  // Clear selected items from cart
+  const clearSelectedCart = async (selectedItems) => {
+    for (const item of selectedItems) {
+      await removeFromCart(item.id || item._id, item.size || 'M');
+    }
+    await fetchCart();
+  };
+
   const getCartTotal = () => state.items.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
   return (
@@ -120,6 +128,7 @@ export const CartProvider = ({ children }) => {
       removeFromCart,
       updateQuantity,
       clearCart,
+      clearSelectedCart,
       getCartTotal
     }}>
       {children}

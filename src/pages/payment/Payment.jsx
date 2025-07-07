@@ -4,9 +4,10 @@ import { useCart } from '../../contexts/CartContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { FaMoneyBillWave, FaQrcode } from 'react-icons/fa';
+import { createOrder } from '../../api/orderApi';
 
 const Payment = () => {
-  const { items, getCartTotal } = useCart();
+  const { items, getCartTotal, clearCart, clearSelectedCart } = useCart();
   const { user, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -19,6 +20,7 @@ const Payment = () => {
   });
   const [paymentMethod, setPaymentMethod] = useState('COD');
   const [qrNotice, setQrNotice] = useState('');
+  const [loading, setLoading] = useState(false);
 
   // Redirect to login if not authenticated
   useEffect(() => {
@@ -48,12 +50,41 @@ const Payment = () => {
     setQrNotice('');
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (paymentMethod === 'COD') {
-      navigate('/success');
-    } else if (paymentMethod === 'QR') {
-      setQrNotice('Tính năng thanh toán QR sẽ sớm ra mắt!');
+    setLoading(true);
+    try {
+      const orderData = {
+        items: selectedProducts.map(item => ({
+          product_id: item.id || item._id,
+          quantity: item.quantity,
+          size: item.size || 'M',
+        })),
+        shipping_info: form,
+        payment_method: paymentMethod,
+        total_amount: selectedProducts.reduce((sum, item) => sum + item.price * item.quantity, 0),
+      };
+      if (paymentMethod === 'COD') {
+        const res = await createOrder(orderData);
+        if (res && res.success) {
+          await clearSelectedCart(selectedProducts);
+          navigate('/success');
+        } else {
+          alert('Đặt hàng thất bại!');
+        }
+      } else if (paymentMethod === 'QR') {
+        const res = await createOrder(orderData);
+        if (res && res.success && res.paymentLink) {
+          await clearSelectedCart(selectedProducts);
+          window.location.href = res.paymentLink;
+        } else {
+          alert('Không lấy được link thanh toán QR!');
+        }
+      }
+    } catch (err) {
+      alert('Có lỗi xảy ra khi đặt hàng!');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -61,7 +92,6 @@ const Payment = () => {
     if (window.confirm('Bạn có chắc chắn muốn hủy thanh toán và quay lại?')) {
       navigate('/cancel');
     }
-    // Nếu không xác nhận thì không làm gì, ở lại trang thanh toán
   };
 
   // Show loading or redirect if not authenticated
@@ -168,8 +198,8 @@ const Payment = () => {
             )}
           </div>
           <div className={styles.actionRow}>
-            <button type="submit" className={styles.payBtn}>
-              Xác nhận thanh toán
+            <button type="submit" className={styles.payBtn} disabled={loading}>
+              {loading ? 'Đang xử lý...' : 'Xác nhận thanh toán'}
             </button>
             <button type="button" onClick={handleCancel} className={styles.cancelBtn}>
               Hủy
