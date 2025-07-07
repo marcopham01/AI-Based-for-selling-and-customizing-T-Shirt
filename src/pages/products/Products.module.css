@@ -286,6 +286,11 @@
     border-color: #3b82f6;
 }
 
+.productCard:active {
+    transform: translateY(-4px) scale(1.01);
+    box-shadow: 0 4px 16px rgba(59,130,246,0.12), 0 1px 4px rgba(0,0,0,0.06);
+}
+
 .productImageContainer {
     width: 100%;
     height: 220px;

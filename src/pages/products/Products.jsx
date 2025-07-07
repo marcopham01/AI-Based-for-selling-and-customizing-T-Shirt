@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { useNavigate } from "react-router-dom"
 import styles from "./Products.module.css"
 import { getProducts } from "../../api/productApi"
 import { useCart } from "../../contexts/CartContext"
@@ -28,6 +29,7 @@ const Products = () => {
 
   const { addToCart } = useCart()
   const { isAuthenticated } = useAuth()
+  const navigate = useNavigate()
 
   useEffect(() => {
     getProducts()
@@ -104,6 +106,10 @@ const Products = () => {
   const handleSizeCancel = () => {
     setSizeModalVisible(false);
     setSelectedProduct(null);
+  };
+
+  const handleProductClick = (productId) => {
+    navigate(`/product/${productId}`);
   };
 
   return (
@@ -195,7 +201,12 @@ const Products = () => {
           {/* Product Grid */}
           <div className={styles.productGrid}>
             {filteredProducts.map((product, idx) => (
-              <div key={product.id || product._id || idx} className={styles.productCard}>
+              <div 
+                key={product.id || product._id || idx} 
+                className={styles.productCard}
+                onClick={() => handleProductClick(product.id || product._id || idx)}
+                style={{ cursor: 'pointer' }}
+              >
                 <div className={styles.productImageContainer}>
                   <img src={product.image || "/placeholder.svg"} alt={product.name} className={styles.productImage} />
                   {product.originalPrice > product.price && (
@@ -207,7 +218,10 @@ const Products = () => {
                   <button
                     className={styles.cartIconBtn}
                     title={isAuthenticated ? "Thêm vào giỏ hàng" : "Đăng nhập để thêm vào giỏ hàng"}
-                    onClick={() => handleAddToCart(product, idx)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleAddToCart(product, idx);
+                    }}
                   >
                     <ShoppingCartOutlined style={{ fontSize: 24 }} />
                   </button>

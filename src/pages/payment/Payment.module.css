@@ -18,12 +18,13 @@
   gap: 2.5rem;
   align-items: flex-start;
 }
-.orderInfo {
+.orderCard {
   flex: 1.2;
-  background: #f9fafb;
-  border-radius: 12px;
-  padding: 1.5rem 1rem;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  padding: 2rem 1.5rem;
+  margin-bottom: 1.5rem;
 }
 .sectionTitle {
   font-size: 1.15rem;
@@ -83,15 +84,15 @@
   font-size: 1.25rem;
   font-weight: 700;
 }
-.form {
+.formCard {
   flex: 1;
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
-  background: #f9fafb;
-  border-radius: 12px;
-  padding: 1.5rem 1rem;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  background: #fff;
+  border-radius: 16px;
+  padding: 2rem 1.5rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
 }
 .form label {
   display: flex;
@@ -122,21 +123,191 @@
   background: #3b82f6;
   color: #fff;
   border: none;
-  padding: 1rem;
-  border-radius: 8px;
-  font-size: 1.1rem;
+  padding: 0.7rem 0;
+  border-radius: 12px;
+  font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
-  margin-top: 1rem;
-  transition: background 0.2s;
+  margin-top: 0;
+  transition: background 0.2s, box-shadow 0.2s;
+  box-shadow: 0 1px 4px rgba(59,130,246,0.08);
 }
 .payBtn:hover {
   background: #2563eb;
+  box-shadow: 0 2px 8px rgba(59,130,246,0.12);
+}
+.paymentCard {
+  background: #f3f4f6;
+  border-radius: 12px;
+  padding: 1.25rem 1rem;
+  margin: 1rem 0 0.5rem 0;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+.paymentTitle {
+  font-weight: 600;
+  color: #2563eb;
+  margin-bottom: 0.75rem;
+  font-size: 1.08rem;
+}
+.paymentOptions {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+.radioLabel {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 100%;
+  font-weight: 500;
+  cursor: pointer;
+  position: relative;
+  gap: 0.5rem;
+  min-height: 22px;
+}
+.radioLabel input[type="radio"] {
+  opacity: 0;
+  position: absolute;
+}
+.radioCustom {
+  width: 22px;
+  height: 22px;
+  border: 2.5px solid #2563eb;
+  border-radius: 50%;
+  display: inline-block;
+  background: #fff;
+  position: relative;
+  transition: border 0.2s, box-shadow 0.2s;
+  box-shadow: 0 1px 4px rgba(37,99,235,0.08);
+  margin-left: 0;
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+.radioLabel span:last-child {
+  flex: 1;
+  word-break: break-word;
+  text-align: left;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.radioLabel input[type="radio"]:hover + .radioCustom {
+  border-color: #60a5fa;
+  box-shadow: 0 2px 8px rgba(96,165,250,0.12);
+}
+.radioLabel input[type="radio"]:checked + .radioCustom {
+  border-color: #2563eb;
+  box-shadow: 0 2px 8px rgba(37,99,235,0.18);
+}
+.radioLabel input[type="radio"]:checked + .radioCustom::after {
+  content: '';
+  display: block;
+  width: 12px;
+  height: 12px;
+  background: #2563eb;
+  border-radius: 50%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+.qrNotice {
+  color: #ef4444;
+  font-size: 0.98rem;
+  margin-top: 0.5rem;
+}
+.actionRow {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+.cancelBtn {
+  width: 100%;
+  background: #e5e7eb;
+  color: #374151;
+  border: none;
+  padding: 0.7rem 0;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, box-shadow 0.2s;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+.cancelBtn:hover {
+  background: #d1d5db;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+.inputDisabled {
+  background: #f5f5f5 !important;
+  color: #9ca3af !important;
+  cursor: not-allowed;
+}
+.formCard label {
+  display: flex;
+  flex-direction: column;
+  font-weight: 500;
+  color: #374151;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+.formCard input,
+.formCard textarea {
+  margin-top: 0.3rem;
+}
+.methodCard {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: border 0.2s, box-shadow 0.2s, background 0.2s;
+  font-size: 1.08rem;
+  margin-bottom: 0.5rem;
+}
+.methodCard:hover {
+  border: 2px solid #60a5fa;
+  background: #f0f7ff;
+}
+.methodCardSelected {
+  composes: methodCard;
+  border: 2px solid #2563eb;
+  background: #e0edff;
+  box-shadow: 0 2px 8px rgba(37,99,235,0.10);
+}
+.methodIcon {
+  font-size: 1.6rem;
+  color: #2563eb;
+  flex-shrink: 0;
+}
+@media (max-width: 600px) {
+  .methodCard, .methodCardSelected {
+    font-size: 0.98rem;
+    padding: 0.75rem 0.75rem;
+  }
+  .methodIcon {
+    font-size: 1.2rem;
+  }
 }
 @media (max-width: 900px) {
   .content {
     flex-direction: column;
     gap: 2rem;
+  }
+  .orderCard, .formCard {
+    padding: 1rem 0.5rem;
+  }
+  .paymentCard {
+    padding: 1rem 0.5rem;
+  }
+  .actionRow {
+    flex-direction: column;
+    gap: 0.75rem;
   }
   .container {
     padding: 16px 4px;

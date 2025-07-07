@@ -3,6 +3,7 @@ import styles from './Payment.module.css';
 import { useCart } from '../../contexts/CartContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { FaMoneyBillWave, FaQrcode } from 'react-icons/fa';
 
 const Payment = () => {
   const { items, getCartTotal } = useCart();
@@ -16,6 +17,8 @@ const Payment = () => {
     address: '',
     note: ''
   });
+  const [paymentMethod, setPaymentMethod] = useState('COD');
+  const [qrNotice, setQrNotice] = useState('');
 
   // Redirect to login if not authenticated
   useEffect(() => {
@@ -40,9 +43,25 @@ const Payment = () => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
+  const handlePaymentMethodChange = (e) => {
+    setPaymentMethod(e.target.value);
+    setQrNotice('');
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    alert('Thanh toán thành công!');
+    if (paymentMethod === 'COD') {
+      navigate('/success');
+    } else if (paymentMethod === 'QR') {
+      setQrNotice('Tính năng thanh toán QR sẽ sớm ra mắt!');
+    }
+  };
+
+  const handleCancel = () => {
+    if (window.confirm('Bạn có chắc chắn muốn hủy thanh toán và quay lại?')) {
+      navigate('/cancel');
+    }
+    // Nếu không xác nhận thì không làm gì, ở lại trang thanh toán
   };
 
   // Show loading or redirect if not authenticated
@@ -55,7 +74,7 @@ const Payment = () => {
       <h1 className={styles.title}>Xác nhận đơn hàng</h1>
       <div className={styles.content}>
         {/* Cột trái: Thông tin đơn hàng */}
-        <div className={styles.orderInfo}>
+        <div className={styles.orderCard}>
           <h2 className={styles.sectionTitle}>Sản phẩm đã đặt</h2>
           <div className={styles.productList}>
             {selectedProducts.map((item, idx) => (
@@ -75,7 +94,7 @@ const Payment = () => {
           </div>
         </div>
         {/* Cột phải: Form thanh toán */}
-        <form className={styles.form} onSubmit={handleSubmit}>
+        <form className={styles.formCard} onSubmit={handleSubmit}>
           <h2 className={styles.sectionTitle}>Thông tin nhận hàng</h2>
           <label>
             Họ tên
@@ -85,7 +104,7 @@ const Payment = () => {
               onChange={handleChange} 
               required 
               disabled
-              style={{ backgroundColor: '#f5f5f5', cursor: 'not-allowed' }}
+              className={styles.inputDisabled}
             />
           </label>
           <label>
@@ -97,7 +116,7 @@ const Payment = () => {
               required 
               pattern="[0-9]{10,11}" 
               disabled
-              style={{ backgroundColor: '#f5f5f5', cursor: 'not-allowed' }}
+              className={styles.inputDisabled}
             />
           </label>
           <label>
@@ -119,7 +138,43 @@ const Payment = () => {
               placeholder="Ghi chú về đơn hàng (nếu có)"
             />
           </label>
-          <button type="submit" className={styles.payBtn}>Xác nhận thanh toán</button>
+          {/* Card chọn phương thức thanh toán */}
+          <div className={styles.paymentCard}>
+            <div className={styles.paymentTitle}>Chọn phương thức thanh toán</div>
+            <div className={styles.paymentOptions}>
+              <div
+                className={paymentMethod === 'COD' ? styles.methodCardSelected : styles.methodCard}
+                onClick={() => handlePaymentMethodChange({ target: { value: 'COD' } })}
+                tabIndex={0}
+                role="button"
+                aria-pressed={paymentMethod === 'COD'}
+              >
+                <FaMoneyBillWave className={styles.methodIcon} />
+                <span>Thanh toán khi nhận hàng (COD)</span>
+              </div>
+              <div
+                className={paymentMethod === 'QR' ? styles.methodCardSelected : styles.methodCard}
+                onClick={() => handlePaymentMethodChange({ target: { value: 'QR' } })}
+                tabIndex={0}
+                role="button"
+                aria-pressed={paymentMethod === 'QR'}
+              >
+                <FaQrcode className={styles.methodIcon} />
+                <span>QR Code</span>
+              </div>
+            </div>
+            {qrNotice && (
+              <div className={styles.qrNotice}>{qrNotice}</div>
+            )}
+          </div>
+          <div className={styles.actionRow}>
+            <button type="submit" className={styles.payBtn}>
+              Xác nhận thanh toán
+            </button>
+            <button type="button" onClick={handleCancel} className={styles.cancelBtn}>
+              Hủy
+            </button>
+          </div>
         </form>
       </div>
     </div>
