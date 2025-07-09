@@ -7,4 +7,8 @@ export const createOrder = async (orderData) => {
 
 export const getOrders = async () => {
   return axiosInstance.get('/order/get');
+};
+
+export const updateOrderStatus = async (orderCode, status) => {
+  return axiosInstance.post('/order/update-status', { orderCode, status });
 }; 

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { Button, Avatar, Form, Input, message, Divider } from 'antd';
-import { UserOutlined, EditOutlined, LogoutOutlined, SaveOutlined } from '@ant-design/icons';
+import { UserOutlined, EditOutlined, LogoutOutlined, SaveOutlined, ShoppingOutlined } from '@ant-design/icons';
 import styles from './Profile.module.css';
 
 const Profile = () => {
@@ -65,6 +65,13 @@ const Profile = () => {
             disabled={isEditing}
           >
             Chỉnh sửa
+          </Button>
+          <Button
+            className={styles.editButtonOutline}
+            icon={<ShoppingOutlined />}
+            onClick={() => navigate('/orders')}
+          >
+            Đơn hàng của bạn
           </Button>
         </div>
         <div className={styles.infoCol}>

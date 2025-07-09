@@ -15,6 +15,7 @@ import ProductDetail from './pages/products/ProductDetail';
 import Custom from './pages/custom/Custom';
 import Success from './pages/paymentStatus/Success';
 import Cancel from './pages/paymentStatus/Cancel';
+import OrderList from './pages/order/OrderList';
 
 
 const router = createBrowserRouter([
@@ -61,6 +62,10 @@ const router = createBrowserRouter([
       {
         path: '/cancel',
         element: <Cancel />,
+      },
+      {
+        path: '/orders',
+        element: <OrderList />,
       },
     ],
   }

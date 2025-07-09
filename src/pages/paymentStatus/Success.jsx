@@ -13,7 +13,10 @@ export default function Success() {
       </div>
       <h2 className={styles.title}>Thanh toán thành công!</h2>
       <p className={styles.message}>Cảm ơn bạn đã mua hàng. Đơn hàng của bạn đã được ghi nhận.</p>
-      <button className={styles.button} onClick={() => navigate('/')}>Quay về trang chủ</button>
+      <div className={styles.buttonGroup}>
+        <button className={styles.buttonHome} onClick={() => navigate('/')}>Quay về trang chủ</button>
+        <button className={styles.buttonOrders} onClick={() => navigate('/orders')}>Xem các đơn hàng của tôi</button>
+      </div>
     </div>
   );
 }

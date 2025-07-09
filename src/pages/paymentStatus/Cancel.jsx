@@ -14,7 +14,10 @@ export default function Cancel() {
       </div>
       <h2 className={styles.title}>Thanh toán thất bại!</h2>
       <p className={styles.message}>Giao dịch của bạn đã bị hủy hoặc gặp lỗi. Vui lòng thử lại hoặc liên hệ hỗ trợ.</p>
-      <button className={styles.button} onClick={() => navigate('/')}>Quay về trang chủ</button>
+      <div className={styles.buttonGroup}>
+        <button className={styles.buttonHome} onClick={() => navigate('/')}>Quay về trang chủ</button>
+        <button className={styles.buttonOrders} onClick={() => navigate('/orders')}>Xem các đơn hàng của tôi</button>
+      </div>
     </div>
   );
 }
