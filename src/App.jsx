@@ -4,6 +4,7 @@ import { createBrowserRouter, Outlet, Route, RouterProvider } from 'react-router
 
 import './App.css';
 import AppLayout from './components/layouts/Layout';
+import AdminLayout from './components/layouts/admin/AdminLayout';
 import { HomePage } from './pages/HomePage';
 import Products from './pages/products/Products';
 import Cart from './pages/cart/Cart';
@@ -16,7 +17,10 @@ import Custom from './pages/custom/Custom';
 import Success from './pages/paymentStatus/Success';
 import Cancel from './pages/paymentStatus/Cancel';
 import OrderList from './pages/order/OrderList';
-
+import AdminDashboard from './pages/admin/dashboard/Dashboard';
+import AdminProducts from './pages/admin/productsManagement/ProductsManagement';
+import AdminUsers from './pages/admin/usersManagement/UsersManagement';
+import AdminOrders from './pages/admin/ordersManagement/OrderManagement';
 
 const router = createBrowserRouter([
   {
@@ -68,8 +72,31 @@ const router = createBrowserRouter([
         element: <OrderList />,
       },
     ],
-  }
+  },
+  {
+    path: '/admin',
+    element: <AdminLayout />,
+    children: [
+      {
+        index: true,
+        element: <AdminDashboard />,
+      },
+      {
+        path: 'products',
+        element: <AdminProducts />,
+      },
+      {
+        path: 'users',
+        element: <AdminUsers />,
+      },
+      {
+        path: 'orders',
+        element: <AdminOrders />,
+      },
+    ],
+  },
 ]);
+
 const App = () => {
   return (
     <AuthProvider>
