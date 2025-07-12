@@ -1,8 +1,28 @@
 import styles from './Success.module.css';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useEffect } from 'react';
+import { updateOrderPaymentStatus } from '../../api/orderApi';
+
+function useQuery() {
+  return new URLSearchParams(useLocation().search);
+}
 
 export default function Success() {
   const navigate = useNavigate();
+  const query = useQuery();
+  const status = query.get('status');
+  const orderCode = query.get('orderCode') || query.get('ordercode') || query.get('order_code');
+  const cancel = query.get('cancel') === 'true';
+
+  useEffect(() => {
+    if (orderCode && status) {
+      updateOrderPaymentStatus({ status, orderCode, cancel })
+        .catch(() => {
+          // Có thể xử lý lỗi ở đây nếu muốn
+        });
+    }
+  }, [orderCode, status, cancel]);
+
   return (
     <div className={styles.container}>
       <div className={styles.iconBox}>

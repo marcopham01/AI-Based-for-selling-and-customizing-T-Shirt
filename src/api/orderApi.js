@@ -11,4 +11,8 @@ export const getOrders = async () => {
 
 export const updateOrderStatus = async (orderCode, status) => {
   return axiosInstance.post('/order/update-status', { orderCode, status });
+};
+
+export const updateOrderPaymentStatus = async ({ status, orderCode, cancel }) => {
+  return axiosInstance.post('/order/update-payment', { status, orderCode, cancel });
 }; 
