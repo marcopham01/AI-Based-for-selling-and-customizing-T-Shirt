@@ -1,16 +1,31 @@
-import { useState } from 'react'
-
-const initialProducts = [
-  { id: 1, name: 'T-Shirt Basic', price: 150000, stock: 20, category: 'Áo thun' },
-  { id: 2, name: 'T-Shirt Premium', price: 250000, stock: 10, category: 'Áo thun' },
-  { id: 3, name: 'Hoodie', price: 350000, stock: 5, category: 'Áo khoác' },
-]
+import { useState, useEffect } from 'react'
 
 export default function AdminProducts() {
-  const [products, setProducts] = useState(initialProducts)
+  const [products, setProducts] = useState([])
   const [search, setSearch] = useState('')
-  const [form, setForm] = useState({ name: '', price: '', stock: '', category: '' })
+  const [form, setForm] = useState({ name: '', price: '', category: '' })
   const [editingId, setEditingId] = useState(null)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState(null)
+
+  const apiBase = 'https://6870e3e47ca4d06b34b88489.mockapi.io/api/admin_products'
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      setLoading(true)
+      try {
+        const res = await fetch(apiBase)
+        if (!res.ok) throw new Error('Lấy dữ liệu thất bại')
+        const data = await res.json()
+        setProducts(data)
+      } catch (err) {
+        setError(err.message)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchProducts()
+  }, [])
 
   const filtered = products.filter(p =>
     p.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -18,135 +33,111 @@ export default function AdminProducts() {
   )
 
   const handleChange = e => {
-    setForm({ ...form, [e.target.name]: e.target.value })
+    const { name, value } = e.target
+    setForm(prev => ({ ...prev, [name]: value }))
   }
 
-  const handleAdd = () => {
-    if (!form.name || !form.price || !form.stock || !form.category) return
-    setProducts([
-      ...products,
-      {
-        id: Date.now(),
-        name: form.name,
-        price: Number(form.price),
-        stock: Number(form.stock),
-        category: form.category
-      }
-    ])
-    setForm({ name: '', price: '', stock: '', category: '' })
+  const handleAdd = async () => {
+    if (!form.name || !form.price || !form.category) return
+    try {
+      const res = await fetch(apiBase, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: form.name,
+          price: Number(form.price),
+          category: form.category
+        })
+      })
+      if (!res.ok) throw new Error('Thêm sản phẩm thất bại')
+      const newProduct = await res.json()
+      setProducts(prev => [...prev, newProduct])
+      setForm({ name: '', price: '', category: '' })
+    } catch (err) {
+      alert(err.message)
+    }
   }
 
-  const handleEdit = (p) => {
+  const handleEdit = p => {
     setEditingId(p.id)
     setForm({
       name: p.name,
       price: p.price,
-      stock: p.stock,
       category: p.category
     })
   }
 
-  const handleUpdate = () => {
-    setProducts(products.map(p =>
-      p.id === editingId
-        ? { ...p, ...form, price: Number(form.price), stock: Number(form.stock) }
-        : p
-    ))
-    setEditingId(null)
-    setForm({ name: '', price: '', stock: '', category: '' })
-  }
-
-  const handleDelete = id => {
-    if (window.confirm('Bạn chắc chắn muốn xóa sản phẩm này?')) {
-      setProducts(products.filter(p => p.id !== id))
+  const handleUpdate = async () => {
+    try {
+      const res = await fetch(`${apiBase}/${editingId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: form.name,
+          price: Number(form.price),
+          category: form.category
+        })
+      })
+      if (!res.ok) throw new Error('Cập nhật thất bại')
+      const updated = await res.json()
+      setProducts(prev => prev.map(p => p.id === editingId ? updated : p))
+      setEditingId(null)
+      setForm({ name: '', price: '', category: '' })
+    } catch (err) {
+      alert(err.message)
     }
   }
 
+  const handleDelete = async id => {
+    if (!window.confirm('Bạn chắc chắn muốn xóa sản phẩm này?')) return
+    try {
+      const res = await fetch(`${apiBase}/${id}`, { method: 'DELETE' })
+      if (!res.ok) throw new Error('Xóa thất bại')
+      setProducts(prev => prev.filter(p => p.id !== id))
+    } catch (err) {
+      alert(err.message)
+    }
+  }
+
+  if (loading) return <p>🔄 Đang tải dữ liệu...</p>
+  if (error) return <p style={{ color: 'red' }}>{error}</p>
+
   return (
-    <div style={{
-      background: 'linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%)',
-      borderRadius: 18,
-      boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.37)',
-      padding: 100,
-      margin: '0 auto',
-      maxWidth: 950,
-      minHeight: 600,
-      backdropFilter: 'blur(8px)',
-      border: '1px solid rgba(255,255,255,0.18)'
-    }}>
-      <h2 style={{
-        marginBottom: 32,
-        fontSize: 32,
-        fontWeight: 800,
-        color: '#4f2e91',
-        letterSpacing: 1,
-        textShadow: '0 2px 12px #fff8'
-      }}>✨ Quản lý sản phẩm ✨</h2>
-      <div style={{
-        marginBottom: 32,
-        display: 'flex',
-        gap: 16,
-        alignItems: 'center'
-      }}>
+    <div style={containerStyle}>
+      <h2 style={headerStyle}>✨ Quản lý sản phẩm ✨</h2>
+      <div style={searchContainerStyle}>
         <input
           type="text"
           placeholder="🔍 Tìm kiếm theo tên hoặc loại"
           value={search}
           onChange={e => setSearch(e.target.value)}
-          style={{
-            padding: 14,
-            borderRadius: 12,
-            border: 'none',
-            outline: 'none',
-            width: 320,
-            background: 'rgba(255,255,255,0.7)',
-            fontSize: 16,
-            color: 'black',
-            boxShadow: '0 2px 8px #b39ddb55'
-          }}
+          style={searchInputStyle}
         />
       </div>
-      <div style={{
-        overflowX: 'auto',
-        borderRadius: 14,
-        boxShadow: '0 4px 24px #9575cd33',
-        background: 'rgba(255,255,255,0.85)',
-        marginBottom: 32
-      }}>
-        <table style={{
-          width: '100%',
-          borderCollapse: 'collapse',
-          fontSize: 17,
-        }}>
+
+      <div style={tableWrapperStyle}>
+        <table style={tableStyle}>
           <thead>
-            <tr style={{ background: 'linear-gradient(90deg, #a18cd1 0%, #fbc2eb 100%)' }}>
+            <tr style={theadRowStyle}>
               <th style={thStyle}>Tên sản phẩm</th>
               <th style={thStyle}>Loại</th>
               <th style={thStyle}>Giá (VNĐ)</th>
-              <th style={thStyle}>Tồn kho</th>
               <th style={thStyle}>Hành động</th>
             </tr>
           </thead>
           <tbody>
             {filtered.length === 0 && (
               <tr>
-                <td colSpan={5} style={{
-                  ...tdStyle,
-                  textAlign: 'center',
-                  color: '#b39ddb',
-                  fontStyle: 'italic'
-                }}>Không có sản phẩm nào phù hợp.</td>
+                <td colSpan={5} style={{ ...tdStyle, textAlign: 'center', color: '#b39ddb', fontStyle: 'italic' }}>
+                  Không có sản phẩm nào phù hợp.
+                </td>
               </tr>
             )}
             {filtered.map(p => (
-              <tr key={p.id} style={{
-                background: 'rgba(255,255,255,0.7)',
-                transition: 'background 0.2s'
-              }}>
+              <tr key={p.id} style={tbodyRowStyle}>
                 <td style={tdStyle}>{p.name}</td>
                 <td style={tdStyle}>{p.category}</td>
                 <td style={tdStyle}>{p.price.toLocaleString()}</td>
-                <td style={tdStyle}>{p.stock}</td>
                 <td style={tdStyle}>
                   <button style={btnEdit} onClick={() => handleEdit(p)}>Sửa</button>
                   <button style={btnDelete} onClick={() => handleDelete(p.id)}>Xóa</button>
@@ -156,52 +147,14 @@ export default function AdminProducts() {
           </tbody>
         </table>
       </div>
-      <h3 style={{
-        fontSize: 22,
-        color: '#7b1fa2',
-        marginBottom: 18,
-        marginTop: 0,
-        fontWeight: 700,
-        textShadow: '0 2px 8px #fff7'
-      }}>
+
+      <h3 style={formHeaderStyle}>
         {editingId ? 'Cập nhật sản phẩm' : 'Thêm sản phẩm mới'}
       </h3>
-      <div style={{
-        display: 'flex',
-        gap: 16,
-        marginBottom: 12,
-        flexWrap: 'wrap'
-      }}>
-        <input
-          name="name"
-          placeholder="Tên sản phẩm"
-          value={form.name}
-          onChange={handleChange}
-          style={inputStyle}
-        />
-        <input
-          name="category"
-          placeholder="Loại"
-          value={form.category}
-          onChange={handleChange}
-          style={inputStyle}
-        />
-        <input
-          name="price"
-          type="number"
-          placeholder="Giá"
-          value={form.price}
-          onChange={handleChange}
-          style={inputStyle}
-        />
-        <input
-          name="stock"
-          type="number"
-          placeholder="Tồn kho"
-          value={form.stock}
-          onChange={handleChange}
-          style={inputStyle}
-        />
+      <div style={formContainerStyle}>
+        <input name="name" placeholder="Tên sản phẩm" value={form.name} onChange={handleChange} style={inputStyle} />
+        <input name="category" placeholder="Loại" value={form.category} onChange={handleChange} style={inputStyle} />
+        <input name="price" type="number" placeholder="Giá" value={form.price} onChange={handleChange} style={inputStyle} />
         {editingId ? (
           <button style={btnSave} onClick={handleUpdate}>💾 Lưu</button>
         ) : (
@@ -210,7 +163,7 @@ export default function AdminProducts() {
         {editingId && (
           <button style={btnCancel} onClick={() => {
             setEditingId(null)
-            setForm({ name: '', price: '', stock: '', category: '' })
+            setForm({ name: '', price: '', category: '' })
           }}>Hủy</button>
         )}
       </div>
@@ -218,6 +171,56 @@ export default function AdminProducts() {
   )
 }
 
+const containerStyle = {
+  background: 'linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%)',
+  borderRadius: 18,
+  boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.37)',
+  padding: 100,
+  margin: '0 auto',
+  maxWidth: 950,
+  minHeight: 600,
+  backdropFilter: 'blur(8px)',
+  border: '1px solid rgba(255,255,255,0.18)'
+}
+const headerStyle = {
+  marginBottom: 32,
+  fontSize: 32,
+  fontWeight: 800,
+  color: '#4f2e91',
+  letterSpacing: 1,
+  textShadow: '0 2px 12px #fff8'
+}
+const searchContainerStyle = {
+  marginBottom: 32,
+  display: 'flex',
+  gap: 16,
+  alignItems: 'center'
+}
+const searchInputStyle = {
+  padding: 14,
+  borderRadius: 12,
+  border: 'none',
+  outline: 'none',
+  width: 320,
+  background: 'rgba(255,255,255,0.7)',
+  fontSize: 16,
+  color: 'black',
+  boxShadow: '0 2px 8px #b39ddb55'
+}
+const tableWrapperStyle = {
+  overflowX: 'auto',
+  borderRadius: 14,
+  boxShadow: '0 4px 24px #9575cd33',
+  background: 'rgba(255,255,255,0.85)',
+  marginBottom: 32
+}
+const tableStyle = {
+  width: '100%',
+  borderCollapse: 'collapse',
+  fontSize: 17
+}
+const theadRowStyle = { background: 'linear-gradient(90deg, #a18cd1 0%, #fbc2eb 100%)' }
+const tbodyRowStyle = { background: 'rgba(255,255,255,0.7)', transition: 'background 0.2s' }
 const thStyle = {
   padding: 18,
   borderBottom: '2px solid #ce93d8',
@@ -231,6 +234,20 @@ const tdStyle = {
   padding: 14,
   borderBottom: '1px solid #e1bee7',
   color: '#333'
+}
+const formHeaderStyle = {
+  fontSize: 22,
+  color: '#7b1fa2',
+  marginBottom: 18,
+  marginTop: 0,
+  fontWeight: 700,
+  textShadow: '0 2px 8px #fff7'
+}
+const formContainerStyle = {
+  display: 'flex',
+  gap: 16,
+  marginBottom: 12,
+  flexWrap: 'wrap'
 }
 const inputStyle = {
   padding: 12,
@@ -255,23 +272,7 @@ const btnAdd = {
   boxShadow: '0 2px 8px #43e97b55',
   transition: 'background 0.2s'
 }
-const btnSave = {
-  ...btnAdd,
-  background: 'linear-gradient(90deg, #f7971e 0%, #ffd200 100%)',
-  color: '#222'
-}
-const btnEdit = {
-  ...btnAdd,
-  background: 'linear-gradient(90deg, #a1c4fd 0%, #c2e9fb 100%)',
-  color: '#222',
-  marginRight: 8
-}
-const btnDelete = {
-  ...btnAdd,
-  background: 'linear-gradient(90deg, #f857a6 0%, #ff5858 100%)'
-}
-const btnCancel = {
-  ...btnAdd,
-  background: 'linear-gradient(90deg, #bdbdbd 0%, #e0e0e0 100%)',
-  color: '#222'
-}
+const btnSave = { ...btnAdd, background: 'linear-gradient(90deg, #f7971e 0%, #ffd200 100%)', color: '#222' }
+const btnEdit = { ...btnAdd, background: 'linear-gradient(90deg, #a1c4fd 0%, #c2e9fb 100%)', color: '#222', marginRight: 8 }
+const btnDelete = { ...btnAdd, background: 'linear-gradient(90deg, #f857a6 0%, #ff5858 100%)' }
+const btnCancel = { ...btnAdd, background: 'linear-gradient(90deg, #bdbdbd 0%, #e0e0e0 100%)', color: '#222' }
