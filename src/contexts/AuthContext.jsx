@@ -7,6 +7,7 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [userRole, setUserRole] = useState(null);
 
   // Load user from API khi app mount nếu có token
   useEffect(() => {
@@ -21,10 +22,13 @@ export const AuthProvider = ({ children }) => {
             phone: apiUser.phonenumber,
           });
           setIsAuthenticated(true);
+          // Xác định role từ backend response
+          setUserRole(apiUser.role || 'customer');
         })
         .catch(() => {
           setUser(null);
           setIsAuthenticated(false);
+          setUserRole(null);
         })
         .finally(() => setIsLoading(false));
     } else {
@@ -32,7 +36,7 @@ export const AuthProvider = ({ children }) => {
     }
   }, []);
 
-  const login = (userData) => {
+  const login = () => {
     setIsAuthenticated(true);
     // Sau khi login thành công, gọi API lấy profile
     getProfile()
@@ -43,16 +47,19 @@ export const AuthProvider = ({ children }) => {
           name: apiUser.fullname,
           phone: apiUser.phonenumber,
         });
+        setUserRole(apiUser.role || 'customer');
       })
       .catch(() => {
         setUser(null);
         setIsAuthenticated(false);
+        setUserRole(null);
       });
   };
 
   const logout = () => {
     setUser(null);
     setIsAuthenticated(false);
+    setUserRole(null);
     localStorage.removeItem('user');
     localStorage.removeItem('token');
   };
@@ -74,17 +81,32 @@ export const AuthProvider = ({ children }) => {
         name: apiUser.fullname,
         phone: apiUser.phonenumber,
       });
+      setUserRole(apiUser.role || 'customer');
       setIsAuthenticated(true);
-    } catch (error) {
+    } catch {
       setUser(null);
       setIsAuthenticated(false);
+      setUserRole(null);
     }
+  };
+
+  // Kiểm tra xem user có phải admin không
+  const isAdmin = () => {
+    return userRole === 'admin';
+  };
+
+  // Kiểm tra xem user có phải customer không
+  const isCustomer = () => {
+    return userRole === 'customer';
   };
 
   const value = {
     user,
     isAuthenticated,
     isLoading,
+    userRole,
+    isAdmin,
+    isCustomer,
     login,
     logout,
     updateUser

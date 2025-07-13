@@ -1,5 +1,5 @@
 import { Dropdown, Layout, Menu } from 'antd'
-import { ShoppingCartOutlined, UserOutlined, SearchOutlined, ReadOutlined } from '@ant-design/icons';
+import { ShoppingCartOutlined, UserOutlined, SearchOutlined, ReadOutlined, SettingOutlined } from '@ant-design/icons';
 import { Space, Badge } from 'antd';
 import { Link, useNavigate } from 'react-router-dom';
 import styles from './Header.module.css';
@@ -17,7 +17,7 @@ const AppHeader = () => {
     const [registerVisible, setRegisterVisible] = useState(false);
     const navigate = useNavigate();
     const { items } = useCart();
-    const { isAuthenticated } = useAuth();
+    const { isAuthenticated, isAdmin, logout } = useAuth();
     
     const categoriesMenu = {
         items: [
@@ -49,9 +49,50 @@ const AppHeader = () => {
         ],
     };
 
+    const adminMenu = {
+        items: [
+            {
+                key: '1',
+                label: <Link to="/admin">Dashboard</Link>,
+            },
+            {
+                key: '2',
+                label: <Link to="/admin/products">Quản lý sản phẩm</Link>,
+            },
+            {
+                key: '3',
+                label: <Link to="/admin/users">Quản lý người dùng</Link>,
+            },
+            {
+                key: '4',
+                label: <Link to="/admin/orders">Quản lý đơn hàng</Link>,
+            },
+        ],
+    };
+
+    const userMenu = {
+        items: [
+            {
+                key: '1',
+                label: <Link to="/profile">Hồ sơ</Link>,
+            },
+            {
+                key: '2',
+                label: <Link to="/orders">Đơn hàng</Link>,
+            },
+            {
+                key: '3',
+                label: <a onClick={() => {
+                    logout();
+                    navigate('/');
+                }}>Đăng xuất</a>,
+            },
+        ],
+    };
+
     const handleUserIconClick = () => {
         if (isAuthenticated) {
-            navigate('/profile');
+            // Không làm gì, sẽ hiển thị dropdown menu
         } else {
             setLoginVisible(true);
         }
@@ -89,10 +130,28 @@ const AppHeader = () => {
                 <div className={styles.iconGroup}>
                     <Space size="large">
                         <SearchOutlined style={{ color: '#fff', fontSize: 18 }} />
-                        <UserOutlined
-                            onClick={handleUserIconClick}
-                            style={{ color: '#fff', fontSize: 18, cursor: 'pointer' }}
-                        />
+                        
+                        {isAuthenticated ? (
+                            <Dropdown menu={userMenu} trigger={['click']}>
+                                <UserOutlined
+                                    style={{ color: '#fff', fontSize: 18, cursor: 'pointer' }}
+                                />
+                            </Dropdown>
+                        ) : (
+                            <UserOutlined
+                                onClick={handleUserIconClick}
+                                style={{ color: '#fff', fontSize: 18, cursor: 'pointer' }}
+                            />
+                        )}
+
+                        {isAuthenticated && isAdmin() && (
+                            <Dropdown menu={adminMenu} trigger={['click']}>
+                                <SettingOutlined 
+                                    style={{ color: '#fff', fontSize: 18, cursor: 'pointer' }} 
+                                />
+                            </Dropdown>
+                        )}
+                        
                     {isAuthenticated && (
                           <Badge count={items.length} size="small" offset={[0, 5]}>
                               <ShoppingCartOutlined 

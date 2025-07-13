@@ -7,7 +7,7 @@ import { getProducts } from "../../api/productApi"
 import { useCart } from "../../contexts/CartContext"
 import { useAuth } from "../../contexts/AuthContext"
 import { ShoppingCartOutlined } from '@ant-design/icons';
-import { notification, message, Modal, Select } from 'antd';
+import { message, Modal, Select } from 'antd';
 
 const Products = () => {
   const [products, setProducts] = useState([])
@@ -208,7 +208,11 @@ const Products = () => {
                 style={{ cursor: 'pointer' }}
               >
                 <div className={styles.productImageContainer}>
-                  <img src={product.image || "/placeholder.svg"} alt={product.name} className={styles.productImage} />
+                  <img
+                    src={Array.isArray(product.images) && product.images[0] ? product.images[0] : "/placeholder.svg"}
+                    alt={product.name}
+                    className={styles.productImage}
+                  />
                   {product.originalPrice > product.price && (
                     <span className={styles.discountBadge}>
                       -{Math.round((1 - product.price / product.originalPrice) * 100)}%

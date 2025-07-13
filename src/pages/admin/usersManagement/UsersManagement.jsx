@@ -1,65 +1,51 @@
-import { useState } from 'react'
-
-const initialUsers = [
-  { id: 1, username: 'admin', email: 'admin@email.com', role: 'admin', status: 'active' },
-  { id: 2, username: 'user1', email: 'user1@email.com', role: 'user', status: 'active' },
-  { id: 3, username: 'user2', email: 'user2@email.com', role: 'user', status: 'inactive' },
-]
+import { useState, useEffect } from 'react'
+import { getAllUsers } from '../../../api/adminApi'
 
 export default function AdminUsers() {
-  const [users, setUsers] = useState(initialUsers)
+  const [users, setUsers] = useState([])
   const [search, setSearch] = useState('')
-  const [form, setForm] = useState({ username: '', email: '', role: 'user', status: 'active' })
-  const [editingId, setEditingId] = useState(null)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+
+  // Load users từ API
+  const loadUsers = async () => {
+    try {
+      setLoading(true)
+      const response = await getAllUsers()
+      setUsers(response.data.data)
+    } catch (err) {
+      setError('Không thể tải danh sách người dùng')
+      console.error('Error loading users:', err)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    loadUsers()
+  }, [])
 
   const filtered = users.filter(u =>
-    u.username.toLowerCase().includes(search.toLowerCase()) ||
-    u.email.toLowerCase().includes(search.toLowerCase())
+    (u.role !== 'admin') && (
+      u.username?.toLowerCase().includes(search.toLowerCase()) ||
+      u.email?.toLowerCase().includes(search.toLowerCase()) ||
+      u.fullname?.toLowerCase().includes(search.toLowerCase())
+    )
   )
 
-  const handleChange = e => {
-    setForm({ ...form, [e.target.name]: e.target.value })
-  }
-
-  const handleAdd = () => {
-    if (!form.username || !form.email) return
-    setUsers([
-      ...users,
-      {
-        id: Date.now(),
-        username: form.username,
-        email: form.email,
-        role: form.role,
-        status: form.status
-      }
-    ])
-    setForm({ username: '', email: '', role: 'user', status: 'active' })
-  }
-
-  const handleEdit = (u) => {
-    setEditingId(u.id)
-    setForm({
-      username: u.username,
-      email: u.email,
-      role: u.role,
-      status: u.status
-    })
-  }
-
-  const handleUpdate = () => {
-    setUsers(users.map(u =>
-      u.id === editingId
-        ? { ...u, ...form }
-        : u
-    ))
-    setEditingId(null)
-    setForm({ username: '', email: '', role: 'user', status: 'active' })
-  }
-
-  const handleDelete = id => {
-    if (window.confirm('Bạn chắc chắn muốn xóa người dùng này?')) {
-      setUsers(users.filter(u => u.id !== id))
-    }
+  if (loading) {
+    return (
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '400px',
+        fontSize: '18px',
+        color: '#ff9800'
+      }}>
+        Đang tải...
+      </div>
+    )
   }
 
   return (
@@ -80,6 +66,20 @@ export default function AdminUsers() {
         letterSpacing: 1,
         textShadow: '0 2px 12px #fff8'
       }}>🌟 Quản lý người dùng 🌟</h2>
+      
+      {error && (
+        <div style={{
+          background: '#ffebee',
+          color: '#c62828',
+          padding: '12px',
+          borderRadius: '8px',
+          marginBottom: '16px',
+          border: '1px solid #ffcdd2'
+        }}>
+          {error}
+        </div>
+      )}
+
       <div style={{
         marginBottom: 32,
         display: 'flex',
@@ -88,7 +88,7 @@ export default function AdminUsers() {
       }}>
         <input
           type="text"
-          placeholder="🔍 Tìm kiếm theo tên hoặc email"
+          placeholder="🔍 Tìm kiếm theo tên, email hoặc họ tên"
           value={search}
           onChange={e => setSearch(e.target.value)}
           style={{
@@ -120,15 +120,16 @@ export default function AdminUsers() {
             <tr style={{ background: 'linear-gradient(90deg, #f7971e 0%, #ffd200 100%)' }}>
               <th style={thStyle}>Tên đăng nhập</th>
               <th style={thStyle}>Email</th>
+              <th style={thStyle}>Họ tên</th>
+              <th style={thStyle}>Số điện thoại</th>
               <th style={thStyle}>Vai trò</th>
-              <th style={thStyle}>Trạng thái</th>
-              <th style={thStyle}>Hành động</th>
+              <th style={thStyle}>Ngày tạo</th>
             </tr>
           </thead>
           <tbody>
             {filtered.length === 0 && (
               <tr>
-                <td colSpan={5} style={{
+                <td colSpan={6} style={{
                   ...tdStyle,
                   textAlign: 'center',
                   color: '#ffb300',
@@ -137,90 +138,39 @@ export default function AdminUsers() {
               </tr>
             )}
             {filtered.map(u => (
-              <tr key={u.id} style={{
+              <tr key={u._id} style={{
                 background: 'rgba(255,255,255,0.7)',
                 transition: 'background 0.2s'
               }}>
                 <td style={tdStyle}>{u.username}</td>
                 <td style={tdStyle}>{u.email}</td>
-                <td style={tdStyle}>{u.role === 'admin' ? 'Admin' : 'User'}</td>
+                <td style={tdStyle}>{u.fullname}</td>
+                <td style={tdStyle}>{u.phonenumber}</td>
                 <td style={tdStyle}>
                   <span style={{
-                    color: u.status === 'active' ? '#43a047' : '#e53935',
+                    color: u.role === 'admin' ? '#e65100' : '#4caf50',
                     fontWeight: 'bold',
-                    textShadow: u.status === 'active' ? '0 0 8px #b9f6ca' : '0 0 8px #ffcdd2'
+                    textShadow: u.role === 'admin' ? '0 0 8px #ffcc02' : '0 0 8px #a5d6a7'
                   }}>
-                    {u.status === 'active' ? 'Hoạt động' : 'Khóa'}
+                    {u.role === 'admin' ? 'Admin' : 'Customer'}
                   </span>
                 </td>
                 <td style={tdStyle}>
-                  <button style={btnEdit} onClick={() => handleEdit(u)}>Sửa</button>
-                  <button style={btnDelete} onClick={() => handleDelete(u.id)}>Xóa</button>
+                  {u.createdAt ? new Date(u.createdAt).toLocaleDateString('vi-VN') : 'N/A'}
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
-      <h3 style={{
-        fontSize: 22,
-        color: '#ff9800',
-        marginBottom: 18,
-        marginTop: 0,
-        fontWeight: 700,
-        textShadow: '0 2px 8px #fff7'
-      }}>
-        {editingId ? 'Cập nhật người dùng' : 'Thêm người dùng mới'}
-      </h3>
+      
       <div style={{
-        display: 'flex',
-        gap: 16,
-        marginBottom: 12,
-        flexWrap: 'wrap'
+        textAlign: 'center',
+        padding: '20px',
+        color: '#666',
+        fontStyle: 'italic'
       }}>
-        <input
-          name="username"
-          placeholder="Tên đăng nhập"
-          value={form.username}
-          onChange={handleChange}
-          style={inputStyle}
-        />
-        <input
-          name="email"
-          placeholder="Email"
-          value={form.email}
-          onChange={handleChange}
-          style={inputStyle}
-        />
-        <select
-          name="role"
-          value={form.role}
-          onChange={handleChange}
-          style={inputStyle}
-        >
-          <option value="user">User</option>
-          <option value="admin">Admin</option>
-        </select>
-        <select
-          name="status"
-          value={form.status}
-          onChange={handleChange}
-          style={inputStyle}
-        >
-          <option value="active">Hoạt động</option>
-          <option value="inactive">Khóa</option>
-        </select>
-        {editingId ? (
-          <button style={btnSave} onClick={handleUpdate}>💾 Lưu</button>
-        ) : (
-          <button style={btnAdd} onClick={handleAdd}>➕ Thêm</button>
-        )}
-        {editingId && (
-          <button style={btnCancel} onClick={() => {
-            setEditingId(null)
-            setForm({ username: '', email: '', role: 'user', status: 'active' })
-          }}>Hủy</button>
-        )}
+        Tổng số người dùng: {filtered.length}
       </div>
     </div>
   )
@@ -239,47 +189,4 @@ const tdStyle = {
   padding: 14,
   borderBottom: '1px solid #ffe0b2',
   color: '#333'
-}
-const inputStyle = {
-  padding: 12,
-  borderRadius: 10,
-  border: 'none',
-  outline: 'none',
-  background: 'rgba(255,255,255,0.8)',
-  fontSize: 16,
-  color: 'black',
-  boxShadow: '0 2px 8px #ffb30033',
-  minWidth: 140
-}
-const btnAdd = {
-  background: 'linear-gradient(90deg, #f7971e 0%, #ffd200 100%)',
-  color: '#fff',
-  border: 'none',
-  borderRadius: 10,
-  padding: '12px 24px',
-  fontWeight: 'bold',
-  fontSize: 16,
-  cursor: 'pointer',
-  boxShadow: '0 2px 8px #ffd20055',
-  transition: 'background 0.2s'
-}
-const btnSave = {
-  ...btnAdd,
-  background: 'linear-gradient(90deg, #43e97b 0%, #38f9d7 100%)',
-  color: '#222'
-}
-const btnEdit = {
-  ...btnAdd,
-  background: 'linear-gradient(90deg, #a1c4fd 0%, #c2e9fb 100%)',
-  color: '#222',
-  marginRight: 8
-}
-const btnDelete = {
-  ...btnAdd,
-  background: 'linear-gradient(90deg, #f857a6 0%, #ff5858 100%)'
-}
-const btnCancel = {
-  ...btnAdd,
-  background: 'linear-gradient(90deg, #bdbdbd 0%, #e0e0e0 100%)',
-  color: '#222'
 }

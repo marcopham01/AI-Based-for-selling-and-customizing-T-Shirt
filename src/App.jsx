@@ -21,11 +21,16 @@ import AdminDashboard from './pages/admin/dashboard/Dashboard';
 import AdminProducts from './pages/admin/productsManagement/ProductsManagement';
 import AdminUsers from './pages/admin/usersManagement/UsersManagement';
 import AdminOrders from './pages/admin/ordersManagement/OrderManagement';
+import { AdminRoute, NotAdminRoute } from './components/ProtectedRoute';
 
 const router = createBrowserRouter([
   {
     path: '/',
-    element: <AppLayout />,
+    element: (
+      <NotAdminRoute>
+        <AppLayout />
+      </NotAdminRoute>
+    ),
     children: [
       {
         index: true,
@@ -75,7 +80,11 @@ const router = createBrowserRouter([
   },
   {
     path: '/admin',
-    element: <AdminLayout />,
+    element: (
+      <AdminRoute>
+        <AdminLayout />
+      </AdminRoute>
+    ),
     children: [
       {
         index: true,

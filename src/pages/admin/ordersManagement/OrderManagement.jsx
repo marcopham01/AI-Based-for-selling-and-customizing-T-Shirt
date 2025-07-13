@@ -102,13 +102,12 @@ export default function AdminOrders() {
               <th style={thStyle}>Sản phẩm</th>
               <th style={thStyle}>Tổng tiền</th>
               <th style={thStyle}>Trạng thái</th>
-              <th style={thStyle}>Hành động</th>
             </tr>
           </thead>
           <tbody>
             {filtered.length === 0 && (
               <tr>
-                <td colSpan={7} style={{
+                <td colSpan={6} style={{
                   ...tdStyle,
                   textAlign: 'center',
                   color: '#43e97b',
@@ -144,20 +143,6 @@ export default function AdminOrders() {
                   }}>
                     {o.status === 'completed' ? 'Hoàn thành' : 'Chờ xử lý'}
                   </span>
-                </td>
-                <td style={tdStyle}>
-                  {o.status === 'pending' && (
-                    <button
-                      style={btnSave}
-                      onClick={() => handleStatus(o.id, 'completed')}
-                    >Xác nhận</button>
-                  )}
-                  {o.status === 'completed' && (
-                    <span style={{
-                      color: '#43a047',
-                      fontWeight: 'bold'
-                    }}>✔</span>
-                  )}
                 </td>
               </tr>
             ))}
