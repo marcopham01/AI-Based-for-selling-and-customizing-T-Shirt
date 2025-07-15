@@ -35,8 +35,10 @@ export const CartProvider = ({ children }) => {
             name: item.product_id.name,
             price: item.product_id.price,
             image: item.product_id.image,
+            images: item.product_id.images || [],
             quantity: item.quantity,
-            size: item.size
+            size: item.size,
+            product_id: item.product_id // giữ lại toàn bộ object để fallback lấy ảnh
           }));
           dispatch({ type: 'LOAD_CART', payload: items });
         } else {

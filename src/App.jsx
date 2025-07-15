@@ -11,17 +11,20 @@ import Cart from './pages/cart/Cart';
 import { CartProvider } from './contexts/CartContext';
 import { AuthProvider } from './contexts/AuthContext';
 import Payment from './pages/payment/Payment';
-import Profile from './pages/user/Profile';
+import UserDashboard from './pages/user/UserDashboard';
 import ProductDetail from './pages/products/ProductDetail';
-import Custom from './pages/custom/Custom';
+
 import Success from './pages/paymentStatus/Success';
 import Cancel from './pages/paymentStatus/Cancel';
-import OrderList from './pages/order/OrderList';
+import OrderList from './pages/user/order/OrderList';
 import AdminDashboard from './pages/admin/dashboard/Dashboard';
 import AdminProducts from './pages/admin/productsManagement/ProductsManagement';
 import AdminUsers from './pages/admin/usersManagement/UsersManagement';
 import AdminOrders from './pages/admin/ordersManagement/OrderManagement';
 import { AdminRoute, NotAdminRoute } from './components/ProtectedRoute';
+import Blog from './pages/info/Blog';
+import Policy from './pages/info/Policy';
+import ImageGenerate from './pages/custom/imageGenerate';
 
 const router = createBrowserRouter([
   {
@@ -45,8 +48,8 @@ const router = createBrowserRouter([
         element: <ProductDetail />,
       },
       {
-        path: '/custom',
-        element: <Custom />,
+        path: '/imageGenerate',
+        element: <ImageGenerate />,
       },
       {
         path: '/cart',
@@ -58,7 +61,7 @@ const router = createBrowserRouter([
       },
       {
         path: '/profile',
-        element: <Profile />,
+        element: <UserDashboard />,
       },
       {
         path: 'product/:id',
@@ -75,6 +78,14 @@ const router = createBrowserRouter([
       {
         path: '/orders',
         element: <OrderList />,
+      },
+      {
+        path: '/info/blogs',
+        element: <Blog />,
+      },
+      {
+        path: '/info/faq',
+        element: <Policy />,
       },
     ],
   },

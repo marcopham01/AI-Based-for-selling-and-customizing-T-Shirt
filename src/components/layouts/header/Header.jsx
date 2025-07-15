@@ -17,24 +17,7 @@ const AppHeader = () => {
     const [registerVisible, setRegisterVisible] = useState(false);
     const navigate = useNavigate();
     const { items } = useCart();
-    const { isAuthenticated, isAdmin, logout } = useAuth();
-    
-    const categoriesMenu = {
-        items: [
-            {
-                key: '1',
-                label: <Link to="/categories/tshirt">T-Shirt</Link>,
-            },
-            {
-                key: '2',
-                label: <Link to="/categories/hoodie">Hoodie</Link>,
-            },
-            {
-                key: '3',
-                label: <Link to="/categories/sweater">Sweater</Link>,
-            }
-        ],
-    };
+    const { isAuthenticated, isAdmin } = useAuth();
 
     const infoMenu = {
         items: [
@@ -44,7 +27,7 @@ const AppHeader = () => {
             },
             {
                 key: '2',
-                label: <Link to="/info/faq">FAQ</Link>,
+                label: <Link to="/info/faq">Policy</Link>,
             },
         ],
     };
@@ -69,42 +52,6 @@ const AppHeader = () => {
             },
         ],
     };
-
-    const userMenu = {
-        items: [
-            {
-                key: '1',
-                label: <Link to="/profile">Hồ sơ</Link>,
-            },
-            {
-                key: '2',
-                label: <Link to="/orders">Đơn hàng</Link>,
-            },
-            {
-                key: '3',
-                label: <a onClick={() => {
-                    logout();
-                    navigate('/');
-                }}>Đăng xuất</a>,
-            },
-        ],
-    };
-
-    const handleUserIconClick = () => {
-        if (isAuthenticated) {
-            // Không làm gì, sẽ hiển thị dropdown menu
-        } else {
-            setLoginVisible(true);
-        }
-    };
-
-    const handleCartClick = () => {
-        if (isAuthenticated) {
-            navigate('/cart');
-        } else {
-            setLoginVisible(true);
-        }
-    };
     
   return (
       <div>
@@ -115,14 +62,8 @@ const AppHeader = () => {
                     </Link>
                 </div>
                 <div className={styles.menu}>
-                    <a href="" onClick={() => navigate('/products')}>Product</a>
-                    <Dropdown
-                        menu={categoriesMenu}
-                        overlayClassName={styles.fullWidthDropdown}
-                        getPopupContainer={() => document.querySelector('.' + styles.header)}
-                    >
-                        <a href="">Categories</a>
-                    </Dropdown>
+                  <a href="" onClick={() => navigate('/products')}>Product</a>
+                  <a href="" onClick={() => navigate('/imageGenerate')}>Custom T-Shirt</a>
                     <Dropdown menu={infoMenu}>
                         <a href="">Info</a>
                     </Dropdown>
@@ -131,18 +72,16 @@ const AppHeader = () => {
                     <Space size="large">
                         <SearchOutlined style={{ color: '#fff', fontSize: 18 }} />
                         
-                        {isAuthenticated ? (
-                            <Dropdown menu={userMenu} trigger={['click']}>
-                                <UserOutlined
-                                    style={{ color: '#fff', fontSize: 18, cursor: 'pointer' }}
-                                />
-                            </Dropdown>
-                        ) : (
-                            <UserOutlined
-                                onClick={handleUserIconClick}
-                                style={{ color: '#fff', fontSize: 18, cursor: 'pointer' }}
-                            />
-                        )}
+                        <UserOutlined
+                            onClick={() => {
+                                if (isAuthenticated) {
+                                    navigate('/profile');
+                                } else {
+                                    setLoginVisible(true);
+                                }
+                            }}
+                            style={{ color: '#fff', fontSize: 18, cursor: 'pointer' }}
+                        />
 
                         {isAuthenticated && isAdmin() && (
                             <Dropdown menu={adminMenu} trigger={['click']}>
@@ -155,7 +94,13 @@ const AppHeader = () => {
                     {isAuthenticated && (
                           <Badge count={items.length} size="small" offset={[0, 5]}>
                               <ShoppingCartOutlined 
-                        onClick={handleCartClick} 
+                        onClick={() => {
+                            if (isAuthenticated) {
+                                navigate('/cart');
+                            } else {
+                                setLoginVisible(true);
+                            }
+                        }} 
                         style={{ color: '#fff', fontSize: 18, cursor: 'pointer' }} />
                           </Badge>
                     )}

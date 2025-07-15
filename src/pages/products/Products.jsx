@@ -235,7 +235,7 @@ const Products = () => {
                   <div className={styles.productRating}>
                     <span className={styles.rating}>★ {product.rating}</span>
                     <span className={styles.reviewCount}>({product.reviewCount})</span>
-                    {Math.random() > 0.7 && <span className={styles.bestSellerBadge}>BEST SELLER</span>}
+                    {product.bestSeller && <span className={styles.bestSellerBadge}>BEST SELLER</span>}
                   </div>
 
                   <h3 className={styles.productName}>{product.name}</h3>

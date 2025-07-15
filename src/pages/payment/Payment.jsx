@@ -6,6 +6,14 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { FaMoneyBillWave, FaQrcode } from 'react-icons/fa';
 import { createOrder } from '../../api/orderApi';
 
+const getProductImage = (item) => {
+  if (Array.isArray(item.images) && item.images.length > 0 && item.images[0]) return item.images[0];
+  if (item.image) return item.image;
+  if (item.product_id && Array.isArray(item.product_id.images) && item.product_id.images.length > 0 && item.product_id.images[0]) return item.product_id.images[0];
+  if (item.product_id && item.product_id.image) return item.product_id.image;
+  return '/placeholder.svg';
+};
+
 const Payment = () => {
   const { items, getCartTotal, clearCart, clearSelectedCart } = useCart();
   const { user, isAuthenticated } = useAuth();
@@ -109,7 +117,7 @@ const Payment = () => {
           <div className={styles.productList}>
             {selectedProducts.map((item, idx) => (
               <div className={styles.productItem} key={item.id || item._id || idx}>
-                <img src={item.image || '/placeholder.svg'} alt={item.name} className={styles.productImage} />
+                <img src={getProductImage(item)} alt={item.name} className={styles.productImage} />
                 <div className={styles.productDetails}>
                   <div className={styles.productName}>{item.name}</div>
                   <div className={styles.productPrice}>{item.price.toLocaleString('vi-VN')}đ</div>

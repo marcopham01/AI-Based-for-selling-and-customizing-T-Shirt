@@ -3,11 +3,11 @@ import { generateImage } from '../../api/chatApi';
 import { message, Input, Button, Spin, Card, Row, Col } from 'antd';
 import { SendOutlined, DownloadOutlined, ArrowLeftOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
-import styles from './Custom.module.css';
+import styles from './ImageGenerate.module.css';
 
 const { TextArea } = Input;
 
-const Custom = () => {
+const ImageGenerate = () => {
   const [prompt, setPrompt] = useState('');
   const [generatedImage, setGeneratedImage] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -72,7 +72,7 @@ const Custom = () => {
             <Card title="Mô tả thiết kế" className={styles.inputCard}>
               <TextArea
                 rows={6}
-                placeholder="Mô tả chi tiết thiết kế bạn muốn tạo (ví dụ: 'Một con mèo dễ thương màu cam với hoa văn Nhật Bản')"
+                placeholder="Mô tả chi tiết thiết kế bạn muốn tạo. Nên dùng tiếng anh để tạo thiết kế chính xác nhất (ví dụ: 'A cat playing with a ball')"
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
                 className={styles.textArea}
@@ -113,7 +113,10 @@ const Custom = () => {
                     block
                   >
                     Tải Xuống
-                  </Button>
+                    </Button>
+                    <Button>
+                      Tạo Thiết Kế Của Riêng Bạn
+                    </Button>
                 </div>
               ) : (
                 <div className={styles.emptyState}>
@@ -128,4 +131,4 @@ const Custom = () => {
   );
 };
 
-export default Custom;
+export default ImageGenerate;

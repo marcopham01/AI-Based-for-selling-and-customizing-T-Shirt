@@ -25,6 +25,14 @@ const Cart = () => {
     return new Intl.NumberFormat('vi-VN').format(price);
   };
 
+  const getProductImage = (item) => {
+    if (Array.isArray(item.images) && item.images.length > 0 && item.images[0]) return item.images[0];
+    if (item.image) return item.image;
+    if (item.product_id && Array.isArray(item.product_id.images) && item.product_id.images.length > 0 && item.product_id.images[0]) return item.product_id.images[0];
+    if (item.product_id && item.product_id.image) return item.product_id.image;
+    return '/placeholder.svg';
+  };
+
   // Show loading or redirect if not authenticated
   if (!isAuthenticated) {
     return null;
@@ -118,7 +126,7 @@ const Cart = () => {
                 className={styles.selectCheckbox}
               />
               <div className={styles.itemImage}>
-                <img src={item.image || "/placeholder.svg"} alt={item.name} />
+                <img src={getProductImage(item)} alt={item.name} />
               </div>
               
               <div className={styles.itemDetails}>
