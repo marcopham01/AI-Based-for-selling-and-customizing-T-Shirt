@@ -25,6 +25,7 @@ import { AdminRoute, NotAdminRoute } from './components/ProtectedRoute';
 import Blog from './pages/info/Blog';
 import Policy from './pages/info/Policy';
 import ImageGenerate from './pages/custom/imageGenerate';
+import CustomDesign from './pages/custom/CustomDesign';
 
 const router = createBrowserRouter([
   {
@@ -87,6 +88,10 @@ const router = createBrowserRouter([
         path: '/info/faq',
         element: <Policy />,
       },
+      {
+        path: '/custom-design',
+        element: <CustomDesign/>
+      }
     ],
   },
   {

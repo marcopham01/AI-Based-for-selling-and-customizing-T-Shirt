@@ -22,34 +22,6 @@ html {
     scrollbar-width: thin;
 }
 
-.sliding-text-bar {
-  position: fixed;
-  top: 60px;
-  left: 0;
-  width: 100%;
-  z-index: 1100;
-  height: 40px;
-  display: flex;
-  align-items: center;
-}
-
-.mainContent {
-  padding-top: 100px !important; /* header 60px + sliding 40px */
-}
-
-@media (max-width: 600px) {
-  .sliding-text-bar {
-    top: 50px;
-    height: 32px;
-    font-size: 13px;
-    padding: 6px 0;
-  }
-  .mainContent {
-    padding-top: 82px !important;
-  }
-}
-
 .ant-dropdown {
   z-index: 2000 !important;
-  
 }

@@ -43,7 +43,9 @@ export default function UserDashboard() {
         {TABS.map(tab => (
           <button
             key={tab.key}
-            className={activeTab === tab.key ? styles.activeTab : styles.tab}
+            className={
+              styles.tab + (activeTab === tab.key ? ' ' + styles.activeTab : '')
+            }
             onClick={() => setActiveTab(tab.key)}
           >
             {tab.label}
