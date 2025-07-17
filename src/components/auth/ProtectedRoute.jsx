@@ -1,5 +1,5 @@
 import { Navigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../../contexts/AuthContext';
 
 // Component bảo vệ route cho admin
 export const AdminRoute = ({ children }) => {
@@ -31,7 +31,6 @@ export const CustomerRoute = ({ children }) => {
   if (!isAuthenticated) {
     return <Navigate to="/" replace />;
   }
-
   return children;
 };
 

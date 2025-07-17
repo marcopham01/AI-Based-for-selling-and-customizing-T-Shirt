@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { getAllUsers } from '../../../api/adminApi'
+import { EyeOutlined, SearchOutlined } from '@ant-design/icons';
 
 export default function AdminUsers() {
   const [users, setUsers] = useState([])
@@ -84,25 +85,29 @@ export default function AdminUsers() {
         marginBottom: 32,
         display: 'flex',
         gap: 16,
-        alignItems: 'center'
+        alignItems: 'center',
+        justifyContent: 'space-between'
       }}>
-        <input
-          type="text"
-          placeholder="🔍 Tìm kiếm theo tên, email hoặc họ tên"
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-          style={{
-            padding: 14,
-            borderRadius: 12,
-            border: 'none',
-            outline: 'none',
-            width: 320,
-            background: 'rgba(255,255,255,0.7)',
-            fontSize: 16,
-            color: 'black',
-            boxShadow: '0 2px 8px #ffb30055'
-          }}
-        />
+        <div style={{ position: 'relative', width: 320 }}>
+          <SearchOutlined style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#222', fontSize: 18, zIndex: 1 }} />
+          <input
+            type="text"
+            placeholder="Tìm kiếm theo tên, email hoặc họ tên"
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            style={{
+              padding: '14px 14px 14px 38px',
+              borderRadius: 12,
+              border: '1px solid #e0e0e0',
+              outline: 'none',
+              width: '100%',
+              background: 'rgba(255,255,255,0.7)',
+              fontSize: 16,
+              color: 'black',
+              boxShadow: '0 2px 8px #ffb30022'
+            }}
+          />
+        </div>
       </div>
       <div style={{
         overflowX: 'auto',
@@ -124,12 +129,13 @@ export default function AdminUsers() {
               <th style={thStyle}>Số điện thoại</th>
               <th style={thStyle}>Vai trò</th>
               <th style={thStyle}>Ngày tạo</th>
+              <th style={thStyle}>Hành động</th>
             </tr>
           </thead>
           <tbody>
             {filtered.length === 0 && (
               <tr>
-                <td colSpan={6} style={{
+                <td colSpan={7} style={{
                   ...tdStyle,
                   textAlign: 'center',
                   color: '#ffb300',
@@ -157,6 +163,11 @@ export default function AdminUsers() {
                 </td>
                 <td style={tdStyle}>
                   {u.createdAt ? new Date(u.createdAt).toLocaleDateString('vi-VN') : 'N/A'}
+                </td>
+                <td style={{ ...tdStyle, textAlign: 'center' }}>
+                  <button style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 18 }} title="Xem chi tiết" onClick={() => alert('Xem chi tiết user: ' + u.username)}>
+                    <EyeOutlined />
+                  </button>
                 </td>
               </tr>
             ))}

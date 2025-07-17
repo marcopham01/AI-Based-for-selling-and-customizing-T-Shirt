@@ -1,0 +1,114 @@
+.myDesignBg {
+  min-height: 100vh;
+  background: transparent;
+  padding: 0;
+}
+
+.myDesignHeader {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.myDesignTabs {
+  display: flex;
+  justify-content: center;
+  gap: 32px;
+  margin-bottom: 32px;
+}
+
+.myDesignTabBtn {
+  border: none;
+  background: #f3f4f6;
+  color: #2563eb;
+  font-weight: 500;
+  border-radius: 20px;
+  padding: 8px 32px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, font-weight 0.2s;
+  outline: none;
+}
+.myDesignTabBtn.active,
+.myDesignTabBtn:focus {
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(37,99,235,0.10);
+}
+.myDesignTabBtn {
+  /* Default: Pending */
+  background: #e0e7ff;
+  color: #2563eb;
+}
+.myDesignTabBtn.active {
+  background: #2563eb;
+  color: #fff;
+}
+.myDesignTabBtn:nth-child(2) {
+  /* Approved */
+  background: #d1fae5;
+  color: #059669;
+}
+.myDesignTabBtn:nth-child(2).active {
+  background: #059669;
+  color: #fff;
+}
+.myDesignTabBtn:nth-child(3) {
+  /* Rejected */
+  background: #fee2e2;
+  color: #ef4444;
+}
+.myDesignTabBtn:nth-child(3).active {
+  background: #ef4444;
+  color: #fff;
+}
+
+.myDesignCard {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(59,130,246,0.10), 0 1.5px 6px rgba(0,0,0,0.04);
+  padding: 24px 32px;
+  margin-bottom: 24px;
+  min-height: 120px;
+  max-width: 700px;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 32px;
+}
+
+.myDesignImage {
+  min-width: 100px;
+  max-width: 120px;
+}
+
+.myDesignImgTag {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(59,130,246,0.08);
+  background: #fff;
+}
+
+.myDesignInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.myDesignName {
+  font-weight: 600;
+  font-size: 18px;
+  color: #1f2937;
+}
+
+.myDesignText {
+  color: #6b7280;
+  font-size: 15px;
+}
+
+.myDesignStatus {
+  min-width: 110px;
+  text-align: center;
+}

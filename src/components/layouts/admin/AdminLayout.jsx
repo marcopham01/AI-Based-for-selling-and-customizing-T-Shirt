@@ -1,43 +1,42 @@
 import { Outlet, useNavigate } from 'react-router-dom';
 import styles from './AdminLayout.module.css';
 import { useAuth } from '../../../contexts/AuthContext';
+import { HomeOutlined, AppstoreOutlined, TeamOutlined, PictureOutlined, UserOutlined, FileTextOutlined } from '@ant-design/icons';
+import { Avatar } from 'antd';
 
 function AdminSidebar() {
   const location = window.location.pathname;
-  const { logout } = useAuth();
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
   return (
     <div className={styles.adminSidebar}>
-      <h2 className={styles.adminSidebarTitle}>TRANG QUẢN TRỊ</h2>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 18 }}>
+        <Avatar size={80} icon={<UserOutlined />} style={{ background: '#e3e9f7', color: '#000', marginBottom: 10 }} />
+        <div style={{ fontWeight: 700, fontSize: 18, color: '#1d3557', marginBottom: 2 }}>{user?.name || 'Admin'}</div>
+        <div style={{ color: '#666', fontSize: 13 }}>{user?.email || ''}</div>
+      </div>
+      <h2 className={styles.adminSidebarTitle}>Quản trị</h2>
       <div className={styles.adminSidebarMenu}>
         <AdminNavLink to="/admin" active={location === '/admin'}>
-          🏠 Dashboard
+          <HomeOutlined style={{ fontSize: 18, marginRight: 10 }} /> Dashboard
         </AdminNavLink>
         <AdminNavLink to="/admin/products" active={location === '/admin/products'}>
-          👕 Quản lý sản phẩm
+          <AppstoreOutlined style={{ fontSize: 18, marginRight: 10 }} /> Sản phẩm
         </AdminNavLink>
         <AdminNavLink to="/admin/users" active={location === '/admin/users'}>
-          👤 Quản lý người dùng
+          <TeamOutlined style={{ fontSize: 18, marginRight: 10 }} /> Người dùng
+        </AdminNavLink>
+        <AdminNavLink to="/admin/designs" active={location === '/admin/designs'}>
+          <PictureOutlined style={{ fontSize: 18, marginRight: 10 }} /> Thiết Kế
         </AdminNavLink>
         <AdminNavLink to="/admin/orders" active={location === '/admin/orders'}>
-          🛒 Quản lý đơn hàng
+          <FileTextOutlined style={{ fontSize: 18, marginRight: 10 }} /> Thống Kê
         </AdminNavLink>
       </div>
       <div className={styles.adminSidebarLogout}>
         <button
+          className="logoutButtonOutline"
           onClick={() => { logout(); navigate('/'); }}
-          style={{
-            background: 'linear-gradient(90deg, #ff9a9e 0%, #fecfef 100%)',
-            color: '#d84315',
-            border: 'none',
-            borderRadius: 10,
-            padding: '12px 32px',
-            fontWeight: 'bold',
-            fontSize: 16,
-            cursor: 'pointer',
-            boxShadow: '0 2px 8px #ffb30033',
-            transition: 'all 0.2s',
-          }}
         >
           Đăng xuất
         </button>

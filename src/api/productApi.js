@@ -7,3 +7,11 @@ export const getProducts = async () => {
 export const getProductDetail = async (id) => {
   return axiosInstance.get(`/products/detail/${id}`);
 };
+
+export const createUserProduct = async (productData) => {
+  return axiosInstance.post('/products/usercreate', productData);
+};
+
+export const getUserDesign = async () => {
+  return axiosInstance.get('/products/getDesign');
+};

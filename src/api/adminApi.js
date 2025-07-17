@@ -5,7 +5,7 @@ export const getAllUsers = () => {
   return axiosInstance.get('/users/get');
 };
 
-// Product Management APIs
+//Product Management APIs
 export const getAllProducts = () => {
   return axiosInstance.get('/products/get');
 };
@@ -24,4 +24,18 @@ export const deleteProduct = (productId) => {
 
 export const getProductDetail = (productId) => {
   return axiosInstance.get(`/products/detail/${productId}`);
-}; 
+};
+
+// Design Management APIs (dành cho admin)
+export const getAllDesigns = () => {
+  return axiosInstance.get('/products/getcreated');
+};
+
+export const updateDesignStatus = (productId, status) => {
+  return axiosInstance.post('/products/update-status', { productId, status });
+};
+
+// Order Management APIs (dành cho admin)
+export const getOrderStats = () => {
+  return axiosInstance.get('/order/gettotal');
+};

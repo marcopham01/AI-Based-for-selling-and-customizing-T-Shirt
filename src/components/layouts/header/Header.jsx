@@ -63,7 +63,8 @@ const AppHeader = () => {
                 </div>
                 <div className={styles.menu}>
                   <a href="" onClick={() => navigate('/products')}>Product</a>
-                  <a href="" onClick={() => navigate('/imageGenerate')}>Custom T-Shirt</a>
+                  <a href="" onClick={() => navigate('/imageGenerate')}>Image Design</a>
+                  <a href="" onClick={() => navigate('/custom-design')}>Design T-Shirt</a>
                     <Dropdown menu={infoMenu}>
                         <a href="">Info</a>
                     </Dropdown>

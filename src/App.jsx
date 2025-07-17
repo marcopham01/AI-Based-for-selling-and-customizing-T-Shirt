@@ -1,7 +1,6 @@
 import AppHeader from './components/layouts/header/Header';
 import AppFooter from './components/layouts/footer/Footer';
 import { createBrowserRouter, Outlet, Route, RouterProvider } from 'react-router-dom';
-
 import './App.css';
 import AppLayout from './components/layouts/Layout';
 import AdminLayout from './components/layouts/admin/AdminLayout';
@@ -13,7 +12,6 @@ import { AuthProvider } from './contexts/AuthContext';
 import Payment from './pages/payment/Payment';
 import UserDashboard from './pages/user/UserDashboard';
 import ProductDetail from './pages/products/ProductDetail';
-
 import Success from './pages/paymentStatus/Success';
 import Cancel from './pages/paymentStatus/Cancel';
 import OrderList from './pages/user/order/OrderList';
@@ -21,11 +19,14 @@ import AdminDashboard from './pages/admin/dashboard/Dashboard';
 import AdminProducts from './pages/admin/productsManagement/ProductsManagement';
 import AdminUsers from './pages/admin/usersManagement/UsersManagement';
 import AdminOrders from './pages/admin/ordersManagement/OrderManagement';
-import { AdminRoute, NotAdminRoute } from './components/ProtectedRoute';
+
+import { AdminRoute, NotAdminRoute, CustomerRoute } from './components/auth/ProtectedRoute';
 import Blog from './pages/info/Blog';
 import Policy from './pages/info/Policy';
 import ImageGenerate from './pages/custom/imageGenerate';
 import CustomDesign from './pages/custom/CustomDesign';
+import AdminDesigns from './pages/admin/designManagement/designManagement';
+
 
 const router = createBrowserRouter([
   {
@@ -50,7 +51,11 @@ const router = createBrowserRouter([
       },
       {
         path: '/imageGenerate',
-        element: <ImageGenerate />,
+        element: (
+          <CustomerRoute>
+            <ImageGenerate />
+          </CustomerRoute>
+        ),
       },
       {
         path: '/cart',
@@ -90,7 +95,11 @@ const router = createBrowserRouter([
       },
       {
         path: '/custom-design',
-        element: <CustomDesign/>
+        element: (
+          <CustomerRoute>
+            <CustomDesign />
+          </CustomerRoute>
+        ),
       }
     ],
   },
@@ -113,6 +122,10 @@ const router = createBrowserRouter([
       {
         path: 'users',
         element: <AdminUsers />,
+      },
+      {
+        path: 'designs',
+        element: <AdminDesigns />,
       },
       {
         path: 'orders',

@@ -54,27 +54,21 @@ const ImageGenerate = () => {
       
       // Tạo blob URL từ response data (image buffer)
       const blob = new Blob([response], { type: 'image/png' });
-      const imageUrl = URL.createObjectURL(blob);
-      setGeneratedImage(imageUrl);
       
-      message.success('Tạo thiết kế thành công!');
+      // Chuyển blob thành base64
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64String = reader.result;
+        setGeneratedImage(base64String);
+        message.success('Tạo thiết kế thành công!');
+      };
+      reader.readAsDataURL(blob);
+      
     } catch (error) {
       console.error('Error generating image:', error);
       message.error('Có lỗi xảy ra khi tạo thiết kế. Vui lòng thử lại!');
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleDownload = () => {
-    if (generatedImage) {
-      const link = document.createElement('a');
-      link.href = generatedImage;
-      link.download = 'custom-design.png';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      message.success('Đã tải xuống thiết kế!');
     }
   };
 
@@ -138,20 +132,26 @@ const ImageGenerate = () => {
       const response = await generateImage(input);
       // Tạo blob URL từ response data (image buffer)
       const blob = new Blob([response], { type: 'image/png' });
-      const imageUrl = URL.createObjectURL(blob);
-      // Thay thế message AI loading bằng message AI thật
-      const newSessions = updatedSessions.map(s => {
-        if (s.id !== currentSessionId) return s;
-        const msgs = [...s.messages];
-        // Tìm vị trí message loading cuối cùng
-        const idx = msgs.findIndex(m => m.loading);
-        if (idx !== -1) {
-          msgs[idx] = { role: 'ai', content: 'Đây là thiết kế bạn yêu cầu:', image: imageUrl };
-        }
-        return { ...s, messages: msgs };
-      });
-      setSessions(newSessions);
-      saveSessions(newSessions);
+      
+      // Chuyển blob thành base64
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64String = reader.result;
+        // Thay thế message AI loading bằng message AI thật
+        const newSessions = updatedSessions.map(s => {
+          if (s.id !== currentSessionId) return s;
+          const msgs = [...s.messages];
+          // Tìm vị trí message loading cuối cùng
+          const idx = msgs.findIndex(m => m.loading);
+          if (idx !== -1) {
+            msgs[idx] = { role: 'ai', content: 'Đây là thiết kế bạn yêu cầu:', image: base64String };
+          }
+          return { ...s, messages: msgs };
+        });
+        setSessions(newSessions);
+        saveSessions(newSessions);
+      };
+      reader.readAsDataURL(blob);
     } catch (error) {
       // Thay thế message AI loading bằng message AI báo lỗi
       const newSessions = updatedSessions.map(s => {
@@ -205,7 +205,7 @@ const ImageGenerate = () => {
                   <span style={{ color: '#000' }}>Đang tạo thiết kế...</span>
                 </div>
               ) : (
-                <ChatMessage key={idx} role={msg.role} content={msg.content} image={msg.image} onDownload={handleDownload} />
+                <ChatMessage key={idx} role={msg.role} content={msg.content} image={msg.image} />
               )
             ))}
           </div>

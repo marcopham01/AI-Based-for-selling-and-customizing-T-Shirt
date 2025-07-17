@@ -1,44 +1,119 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { getOrderStats } from '../../../api/adminApi';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+  ArcElement,
+} from 'chart.js';
+import { Bar, Pie } from 'react-chartjs-2';
 
-const initialOrders = [
-  {
-    id: 1001,
-    customer: 'Nguyễn Văn A',
-    email: 'vana@email.com',
-    items: [
-      { name: 'T-Shirt Basic', qty: 2, price: 150000 },
-      { name: 'Hoodie', qty: 1, price: 350000 }
-    ],
-    total: 650000,
-    status: 'pending'
-  },
-  {
-    id: 1002,
-    customer: 'Trần Thị B',
-    email: 'thib@email.com',
-    items: [
-      { name: 'T-Shirt Premium', qty: 1, price: 250000 }
-    ],
-    total: 250000,
-    status: 'completed'
-  }
-]
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+  ArcElement
+);
 
 export default function AdminOrders() {
-  const [orders, setOrders] = useState(initialOrders)
-  const [search, setSearch] = useState('')
+  const [orderStats, setOrderStats] = useState(null)
 
-  const filtered = orders.filter(o =>
-    o.customer.toLowerCase().includes(search.toLowerCase()) ||
-    o.email.toLowerCase().includes(search.toLowerCase()) ||
-    o.id.toString().includes(search)
-  )
-
-  const handleStatus = (id, status) => {
-    setOrders(orders.map(o =>
-      o.id === id ? { ...o, status } : o
-    ))
+  // Load thống kê đơn hàng
+  const loadOrderStats = async () => {
+    try {
+      const response = await getOrderStats()
+      setOrderStats(response.data.data)
+    } catch (err) {
+      console.error('Error loading order stats:', err)
+    }
   }
+
+  useEffect(() => {
+    loadOrderStats()
+  }, [])
+
+  // Chart data cho thống kê theo status
+  const statusChartData = {
+    labels: ['Hoàn thành', 'Đang chờ', 'Đã hủy'],
+    datasets: [
+      {
+        label: 'Số lượng đơn hàng',
+        data: [
+          orderStats?.doneCount || 0,
+          orderStats?.totalOrders - (orderStats?.doneCount || 0) - (orderStats?.cancelCount || 0) || 0,
+          orderStats?.cancelCount || 0
+        ],
+        backgroundColor: [
+          'rgba(75, 192, 192, 0.6)',
+          'rgba(255, 206, 86, 0.6)',
+          'rgba(255, 99, 132, 0.6)',
+        ],
+        borderColor: [
+          'rgba(75, 192, 192, 1)',
+          'rgba(255, 206, 86, 1)',
+          'rgba(255, 99, 132, 1)',
+        ],
+        borderWidth: 1,
+      },
+    ],
+  };
+
+  // Chart data cho doanh thu
+  const revenueChartData = {
+    labels: ['Doanh thu'],
+    datasets: [
+      {
+        label: 'Tổng doanh thu (VNĐ)',
+        data: [orderStats?.totalRevenue || 0],
+        backgroundColor: 'rgba(54, 162, 235, 0.6)',
+        borderColor: 'rgba(54, 162, 235, 1)',
+        borderWidth: 1,
+      },
+    ],
+  };
+
+  const chartOptions = {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: 'top',
+      },
+      title: {
+        display: true,
+        text: 'Thống kê đơn hàng',
+      },
+    },
+  };
+
+  const revenueChartOptions = {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: 'top',
+      },
+      title: {
+        display: true,
+        text: 'Tổng doanh thu',
+      },
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        ticks: {
+          callback: function(value) {
+            return value.toLocaleString('vi-VN') + ' ₫';
+          }
+        }
+      }
+    }
+  };
 
   return (
     <div style={{
@@ -47,7 +122,7 @@ export default function AdminOrders() {
       boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.15)',
       padding: 40,
       minHeight: 600,
-      maxWidth: 1100,
+      maxWidth: 1200,
       margin: '0 auto'
     }}>
       <h2 style={{
@@ -57,125 +132,91 @@ export default function AdminOrders() {
         color: '#00796b',
         letterSpacing: 1,
         textShadow: '0 2px 12px #fff8'
-      }}>🛒 Quản lý đơn hàng 🛒</h2>
+      }}>📊 Thống kê đơn hàng 📊</h2>
+
+      {/* Thống kê tổng quan */}
+      {orderStats && (
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+          gap: 20,
+          marginBottom: 32
+        }}>
+          <div style={{
+            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            padding: '20px',
+            borderRadius: '12px',
+            color: 'white',
+            textAlign: 'center'
+          }}>
+            <h3 style={{ margin: 0, fontSize: '14px', opacity: 0.9 }}>Tổng đơn hàng</h3>
+            <p style={{ margin: '10px 0 0 0', fontSize: '24px', fontWeight: 'bold' }}>
+              {orderStats.totalOrders}
+            </p>
+          </div>
+          <div style={{
+            background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+            padding: '20px',
+            borderRadius: '12px',
+            color: 'white',
+            textAlign: 'center'
+          }}>
+            <h3 style={{ margin: 0, fontSize: '14px', opacity: 0.9 }}>Tổng doanh thu</h3>
+            <p style={{ margin: '10px 0 0 0', fontSize: '24px', fontWeight: 'bold' }}>
+              {orderStats.totalRevenue?.toLocaleString('vi-VN')} ₫
+            </p>
+          </div>
+          <div style={{
+            background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+            padding: '20px',
+            borderRadius: '12px',
+            color: 'white',
+            textAlign: 'center'
+          }}>
+            <h3 style={{ margin: 0, fontSize: '14px', opacity: 0.9 }}>Đơn hoàn thành</h3>
+            <p style={{ margin: '10px 0 0 0', fontSize: '24px', fontWeight: 'bold' }}>
+              {orderStats.doneCount} ({orderStats.doneRatio})
+            </p>
+          </div>
+          <div style={{
+            background: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
+            padding: '20px',
+            borderRadius: '12px',
+            color: 'white',
+            textAlign: 'center'
+          }}>
+            <h3 style={{ margin: 0, fontSize: '14px', opacity: 0.9 }}>Đơn đã hủy</h3>
+            <p style={{ margin: '10px 0 0 0', fontSize: '24px', fontWeight: 'bold' }}>
+              {orderStats.cancelCount} ({orderStats.cancelRatio})
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* Charts */}
       <div style={{
-        marginBottom: 32,
-        display: 'flex',
-        gap: 16,
-        alignItems: 'center'
-      }}>
-        <input
-          type="text"
-          placeholder="🔍 Tìm kiếm theo tên, email hoặc mã đơn hàng"
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-          style={{
-            padding: 14,
-            borderRadius: 12,
-            border: 'none',
-            outline: 'none',
-            width: 350,
-            background: 'rgba(255,255,255,0.7)',
-            fontSize: 16,
-            color: 'black',
-            boxShadow: '0 2px 8px #43e97b55'
-          }}
-        />
-      </div>
-      <div style={{
-        overflowX: 'auto',
-        borderRadius: 14,
-        boxShadow: '0 4px 24px #43e97b33',
-        background: 'rgba(255,255,255,0.85)',
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))',
+        gap: 24,
         marginBottom: 32
       }}>
-        <table style={{
-          width: '100%',
-          borderCollapse: 'collapse',
-          fontSize: 17,
+        <div style={{
+          background: 'white',
+          padding: '20px',
+          borderRadius: '12px',
+          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
         }}>
-          <thead>
-            <tr style={{ background: 'linear-gradient(90deg, #43e97b 0%, #38f9d7 100%)' }}>
-              <th style={thStyle}>Mã đơn</th>
-              <th style={thStyle}>Khách hàng</th>
-              <th style={thStyle}>Email</th>
-              <th style={thStyle}>Sản phẩm</th>
-              <th style={thStyle}>Tổng tiền</th>
-              <th style={thStyle}>Trạng thái</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filtered.length === 0 && (
-              <tr>
-                <td colSpan={6} style={{
-                  ...tdStyle,
-                  textAlign: 'center',
-                  color: '#43e97b',
-                  fontStyle: 'italic'
-                }}>Không có đơn hàng nào phù hợp.</td>
-              </tr>
-            )}
-            {filtered.map(o => (
-              <tr key={o.id} style={{
-                background: 'rgba(255,255,255,0.7)',
-                transition: 'background 0.2s'
-              }}>
-                <td style={tdStyle}>#{o.id}</td>
-                <td style={tdStyle}>{o.customer}</td>
-                <td style={tdStyle}>{o.email}</td>
-                <td style={tdStyle}>
-                  <ul style={{ margin: 0, paddingLeft: 18 }}>
-                    {o.items.map((item, idx) => (
-                      <li key={idx}>
-                        {item.name} <span style={{ color: '#888' }}>x{item.qty}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </td>
-                <td style={tdStyle}>{o.total.toLocaleString()}₫</td>
-                <td style={tdStyle}>
-                  <span style={{
-                    color: o.status === 'completed' ? '#43a047' : '#ff9800',
-                    fontWeight: 'bold',
-                    textShadow: o.status === 'completed'
-                      ? '0 0 8px #b9f6ca'
-                      : '0 0 8px #ffe082'
-                  }}>
-                    {o.status === 'completed' ? 'Hoàn thành' : 'Chờ xử lý'}
-                  </span>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+          <Pie data={statusChartData} options={chartOptions} />
+        </div>
+        <div style={{
+          background: 'white',
+          padding: '20px',
+          borderRadius: '12px',
+          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+        }}>
+          <Bar data={revenueChartData} options={revenueChartOptions} />
+        </div>
       </div>
     </div>
   )
-}
-
-const thStyle = {
-  padding: 18,
-  borderBottom: '2px solid #43e97b',
-  textAlign: 'left',
-  color: '#00796b',
-  fontWeight: 700,
-  fontSize: 18,
-  letterSpacing: 0.5
-}
-const tdStyle = {
-  padding: 14,
-  borderBottom: '1px solid #b2dfdb',
-  color: '#333'
-}
-const btnSave = {
-  background: 'linear-gradient(90deg, #f7971e 0%, #ffd200 100%)',
-  color: '#222',
-  border: 'none',
-  borderRadius: 10,
-  padding: '10px 20px',
-  fontWeight: 'bold',
-  fontSize: 15,
-  cursor: 'pointer',
-  boxShadow: '0 2px 8px #ffd20055',
-  transition: 'background 0.2s'
 }

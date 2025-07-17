@@ -4,11 +4,23 @@ import { RobotOutlined, DownloadOutlined, PlusOutlined } from '@ant-design/icons
 import { Button } from 'antd';
 import { useNavigate } from 'react-router-dom';
 
-const ChatMessage = ({ role, content, image, onDownload }) => {
+const ChatMessage = ({ role, content, image }) => {
   const navigate = useNavigate();
 
   const handleCreateProduct = () => {
+    // image giờ đã là base64 string, không cần thay đổi gì
     navigate('/custom-design', { state: { image } });
+  };
+
+  const handleDownload = () => {
+    if (image) {
+      const link = document.createElement('a');
+      link.href = image; // image giờ đã là base64, có thể dùng trực tiếp
+      link.download = 'custom-design.png';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
   };
 
   return (
@@ -29,7 +41,7 @@ const ChatMessage = ({ role, content, image, onDownload }) => {
                   icon={<DownloadOutlined />}
                   size="small"
                   style={{ marginTop: 2, background: '#1976d2', color: '#fff', border: 'none', borderRadius: 6 }}
-                  onClick={onDownload}
+                  onClick={handleDownload}
                 >
                   Tải ảnh
                 </Button>
