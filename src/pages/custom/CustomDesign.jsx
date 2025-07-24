@@ -54,26 +54,42 @@ export default function CustomDesign() {
     return true;
   };
 
+  // Thêm hàm chuyển base64 sang file
+  function dataURLtoFile(dataurl, filename) {
+      let arr = dataurl.split(',');
+      let mime = arr[0].match(/:(.*?);/)[1];
+      let bstr = atob(arr[1]);
+      let n = bstr.length;
+      let u8arr = new Uint8Array(n);
+      while(n--){
+          u8arr[n] = bstr.charCodeAt(n);
+      }
+      return new File([u8arr], filename, {type:mime});
+  }
+
   // Xử lý submit
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validate()) return;
     setLoading(true);
     try {
-      // Nếu là file upload thì dùng base64, nếu là ảnh từ chat thì là URL
-      let imageUrl = form.imagePreview;
-      const productData = {
-        name: form.name,
-        description: form.description,
-        price: Number(form.price) || 300000,
-        sizes: form.sizes,
-        gender: form.gender,
-        material: form.material,
-        images: [imageUrl],
-      };
-      await createUserProduct(productData);
+      const formData = new FormData();
+      formData.append('name', form.name);
+      formData.append('description', form.description);
+      formData.append('price', Number(form.price) || 300000);
+      formData.append('sizes', JSON.stringify(form.sizes)); // gửi dạng chuỗi
+      formData.append('gender', form.gender);
+      formData.append('material', form.material);
+
+      // Xử lý ảnh: nếu là file upload thì dùng, nếu là base64 thì convert sang file
+      let imageFile = form.image;
+      if (!imageFile && form.imagePreview && form.imagePreview.startsWith('data:image')) {
+        imageFile = dataURLtoFile(form.imagePreview, 'design.png');
+      }
+      formData.append('image', imageFile);
+
+      await createUserProduct(formData); // sửa API để nhận FormData
       message.success('Tạo sản phẩm thành công!');
-      console.log(productData);
       navigate('/profile');
     } catch (error) {
       message.error('Có lỗi khi tạo sản phẩm: ' + (error.response?.data?.message || error.message));

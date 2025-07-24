@@ -8,8 +8,12 @@ export const getProductDetail = async (id) => {
   return axiosInstance.get(`/products/detail/${id}`);
 };
 
-export const createUserProduct = async (productData) => {
-  return axiosInstance.post('/products/usercreate', productData);
+export const createUserProduct = (formData) => {
+  return axiosInstance.post('/products/usercreate', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
 };
 
 export const getUserDesign = async () => {

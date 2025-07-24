@@ -106,6 +106,14 @@ export default function AdminDesigns() {
     })
   }
 
+  // Thêm hàm tạo URL ảnh đúng
+  const getImageUrl = (img) => {
+    if (!img) return '/no-image.png';
+    if (img.startsWith('data:image')) return img;
+    // Nếu là đường dẫn uploads/xxx, ghép với domain backend
+    return `http://localhost:5000/${img.replace(/\\/g, '/').replace(/\\/g, '/').replace(/\+/g, '/')}`;
+  };
+
   if (loading) {
     return (
       <div style={{
@@ -221,12 +229,12 @@ export default function AdminDesigns() {
               }}>
                 <td style={tdStyle}>
                   <div style={{ fontWeight: '600', color: '#333' }}>
-                    {design.user?.name || 'N/A'}
+                    {design.user_id?.fullname || 'N/A'}
                   </div>
                 </td>
                 <td style={tdStyle}>
                   <div style={{ color: '#666', fontSize: '14px' }}>
-                    {design.user?.email || 'N/A'}
+                    {design.user_id?.email || 'N/A'}
                   </div>
                 </td>
                 <td style={tdStyle}>
@@ -235,7 +243,7 @@ export default function AdminDesigns() {
                       design.images.map((img, idx) => (
                         <img 
                           key={idx} 
-                          src={img} 
+                          src={getImageUrl(img)} 
                           alt="Thiết kế" 
                           style={{ 
                             width: 60, 
@@ -364,7 +372,7 @@ export default function AdminDesigns() {
               {selectedDesign.images && selectedDesign.images.map((img, idx) => (
                 <div key={idx} style={{ textAlign: 'center' }}>
                   <img 
-                    src={img} 
+                    src={getImageUrl(img)} 
                     alt={`Thiết kế ${idx + 1}`}
                     style={{
                       width: '100%',

@@ -6,6 +6,8 @@ import styles from './UserDashboard.module.css';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { message } from 'antd';
+import { useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 
 const TABS = [
   { key: 'profile', label: 'Thông Tin Cá Nhân' },
@@ -17,6 +19,16 @@ export default function UserDashboard() {
   const [activeTab, setActiveTab] = useState('profile');
   const { logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const tab = params.get('tab');
+    if (tab && TABS.some(t => t.key === tab)) {
+      setActiveTab(tab);
+    }
+    // eslint-disable-next-line
+  }, [location.search]);
 
   const handleLogout = () => {
     logout();

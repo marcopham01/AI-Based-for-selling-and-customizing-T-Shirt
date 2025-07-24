@@ -36,7 +36,7 @@ export default function Cancel() {
       <p className={styles.message}>Giao dịch của bạn đã bị hủy hoặc gặp lỗi. Vui lòng thử lại hoặc liên hệ hỗ trợ.</p>
       <div className={styles.buttonGroup}>
         <button className={styles.buttonHome} onClick={() => navigate('/')}>Quay về trang chủ</button>
-        <button className={styles.buttonOrders} onClick={() => navigate('/orders')}>Xem các đơn hàng của tôi</button>
+        <button className={styles.buttonOrders} onClick={() => navigate('/profile?tab=orders')}>Xem các đơn hàng của tôi</button>
       </div>
     </div>
   );

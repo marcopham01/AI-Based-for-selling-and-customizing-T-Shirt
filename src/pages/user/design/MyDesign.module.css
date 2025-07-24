@@ -112,3 +112,24 @@
   min-width: 110px;
   text-align: center;
 }
+
+.addToCartBtn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  
+  color: #000;
+  border: 2px solid #000;
+  border-radius: 8px;
+  padding: 8px 18px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, border 0.2s;
+  box-shadow: 0 2px 8px rgba(37,99,235,0.08);
+}
+.addToCartBtn:hover, .addToCartBtn:focus {
+  background: #EFEFEF;
+  border-color: #000;
+  color: #000;
+}

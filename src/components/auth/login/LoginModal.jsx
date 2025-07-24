@@ -39,6 +39,7 @@ export const LoginModal = ({ visible, onClose, onSwitchToRegister }) => {
         navigate('/admin');
       } else {
         navigate('/');
+        
       }
     } catch (error) {
       console.error('Login failed:', error);

@@ -70,7 +70,9 @@ export const AuthProvider = ({ children }) => {
       const payload = {
         ...newUserData,
         fullname: newUserData.name,
+        email: newUserData.email,
         phonenumber: newUserData.phone,
+        address: newUserData.address,
       };
       await updateProfileApi(payload);
       // Sau khi update thành công, lấy lại profile mới nhất
@@ -79,7 +81,9 @@ export const AuthProvider = ({ children }) => {
       setUser({
         ...apiUser,
         name: apiUser.fullname,
+        email: apiUser.email,
         phone: apiUser.phonenumber,
+        address: apiUser.address,
       });
       setUserRole(apiUser.role || 'customer');
       setIsAuthenticated(true);

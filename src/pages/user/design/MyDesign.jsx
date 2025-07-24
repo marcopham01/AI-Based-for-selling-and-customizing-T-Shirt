@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { getUserDesign } from '../../../api/productApi';
-import { Spin, Empty, Badge } from 'antd';
+import { useCart } from '../../../contexts/CartContext';
+import { message, Spin, Empty, Badge, Modal, Select } from 'antd';
+import { ShoppingCartOutlined } from '@ant-design/icons';
 import styles from './MyDesign.module.css';
 
 const statusColor = {
@@ -15,10 +17,22 @@ const statusList = [
   { key: 'rejected', label: 'Rejected' },
 ];
 
+// Thêm hàm tạo URL ảnh đúng
+const getImageUrl = (img) => {
+  if (!img) return '/placeholder.svg';
+  if (img.startsWith('data:image')) return img;
+  // Nếu là đường dẫn uploads/xxx, ghép với domain backend
+  return `http://localhost:5000/${img.replace(/\\/g, '/').replace(/\\/g, '/').replace(/\+/g, '/')}`;
+};
+
 const MyDesign = () => {
   const [designs, setDesigns] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('pending');
+  const { addToCart } = useCart();
+  const [sizeModalVisible, setSizeModalVisible] = useState(false);
+  const [selectedDesign, setSelectedDesign] = useState(null);
+  const [selectedSize, setSelectedSize] = useState('');
 
   useEffect(() => {
     const fetchDesigns = async () => {
@@ -37,6 +51,32 @@ const MyDesign = () => {
 
   const filteredDesigns = designs.filter(d => d.status === filter);
   const getCount = status => designs.filter(d => d.status === status).length;
+
+  const handleAddToCart = (design) => {
+    const sizes = Array.isArray(design.sizes) ? design.sizes : [design.sizes];
+    if (sizes.length === 1) {
+      addToCart({ ...design, id: design._id, size: sizes[0] });
+      message.success(`${design.name} đã được thêm vào giỏ hàng!`);
+    } else {
+      setSelectedDesign(design);
+      setSelectedSize(sizes[0]);
+      setSizeModalVisible(true);
+    }
+  };
+
+  const handleSizeConfirm = () => {
+    if (selectedDesign) {
+      addToCart({ ...selectedDesign, id: selectedDesign._id, size: selectedSize });
+      message.success(`${selectedDesign.name} (Size ${selectedSize}) đã được thêm vào giỏ hàng!`);
+      setSizeModalVisible(false);
+      setSelectedDesign(null);
+    }
+  };
+
+  const handleSizeCancel = () => {
+    setSizeModalVisible(false);
+    setSelectedDesign(null);
+  };
 
   return (
     <div className={styles.myDesignBg}>
@@ -67,7 +107,7 @@ const MyDesign = () => {
               {/* Ảnh */}
               <div className={styles.myDesignImage}>
                 <img
-                  src={Array.isArray(design.images) && design.images[0] ? design.images[0] : '/placeholder.svg'}
+                  src={Array.isArray(design.images) && design.images[0] ? getImageUrl(design.images[0]) : '/placeholder.svg'}
                   alt={design.name}
                   className={styles.myDesignImgTag}
                 />
@@ -94,11 +134,53 @@ const MyDesign = () => {
                   }
                   style={{ fontSize: 16, fontWeight: 600 }}
                 />
+                {design.status === 'approved' && (
+                  <button
+                    className={styles.addToCartBtn}
+                    onClick={() => handleAddToCart(design)}
+                    style={{ marginTop: 12 }}
+                  >
+                    <ShoppingCartOutlined style={{ fontSize: 18 }} />
+                    Thêm vào giỏ hàng
+                  </button>
+                )}
               </div>
             </div>
           ))
         )}
       </div>
+      {/* Modal chọn size */}
+      <Modal
+        title="Chọn kích thước"
+        open={sizeModalVisible}
+        onOk={handleSizeConfirm}
+        onCancel={handleSizeCancel}
+        okText="Thêm vào giỏ hàng"
+        cancelText="Hủy"
+      >
+        {selectedDesign && (
+          <div style={{ textAlign: 'center' }}>
+            <img
+              src={Array.isArray(selectedDesign.images) && selectedDesign.images[0] ? getImageUrl(selectedDesign.images[0]) : "/placeholder.svg"}
+              alt={selectedDesign.name}
+              style={{ width: '100px', height: '100px', objectFit: 'cover', marginBottom: '16px' }}
+            />
+            <h3>{selectedDesign.name}</h3>
+            <p style={{ marginBottom: '16px' }}>Chọn kích thước:</p>
+            <Select
+              value={selectedSize}
+              onChange={setSelectedSize}
+              style={{ width: '100%' }}
+            >
+              {(Array.isArray(selectedDesign.sizes) ? selectedDesign.sizes : [selectedDesign.sizes]).map(size => (
+                <Select.Option key={size} value={size}>
+                  {size}
+                </Select.Option>
+              ))}
+            </Select>
+          </div>
+        )}
+      </Modal>
     </div>
   );
 };
